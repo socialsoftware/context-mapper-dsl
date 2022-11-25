@@ -187,7 +187,7 @@ Aggregate :
     	('storageSimilarity' ('=')? storageSimilarity=Similarity)? &
     	('securityCriticality' ('=')? securityCriticality=Criticality)? &
     	('securityZone' ('=')? securityZone=STRING)? &
-    	('securityAccessGroup' ('=')? securityAccessGroup=STRING)?
+    	('securityAccessGroup' ('=')? securityAccessGroup=STRING)?   	
     )
     ((services+=Service) |
      (resources+=Resource) |
