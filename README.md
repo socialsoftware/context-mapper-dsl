@@ -13,7 +13,6 @@ The Context Mapper project has originally been developed as part of research pro
  Context Mapper is available for Visual Studio Code and Eclipse:
    * VS Code:
      * [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=contextmapper.context-mapper-vscode-extension)
-     * **Note:** We have only recently published the VS Code extension and it does not support all features yet. Find a feature support table [here](https://contextmapper.org/docs/ide/). We continuously work on the extension and it should support all features soon!
    * Eclipse:
      * [Eclipse Marketplace](https://marketplace.eclipse.org/content/context-mapper)
      * Update Site: https://contextmapper.jfrog.io/artifactory/context-mapper-eclipse/updates/
@@ -37,7 +36,7 @@ The Context Mapper project has originally been developed as part of research pro
 ## System Requirements
 To use the ContextMapper DSL (CML) you need the following tools:
 
-* [Java JDK](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) (JDK 8 or newer)
+* [Java JDK](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) (JDK 11 or newer)
 * [Eclipse](https://www.eclipse.org/downloads/packages/) or [Visual Studio Code](https://code.visualstudio.com/)
 * If you want to use our [Context Map generator](https://contextmapper.org/docs/context-map-generator/) you need to have [Graphviz](https://www.graphviz.org/) installed on your system.
     * Ensure that the binaries are part of the _PATH_ environment variable and can be called from the terminal.
@@ -63,7 +62,7 @@ If you want to use the Context Mapper DSL (CML) language and the generator tools
 
 **Gradle:**
 ```gradle
-implementation 'org.contextmapper:context-mapper-dsl:6.6.0'
+implementation 'org.contextmapper:context-mapper-dsl:6.7.0'
 ```
 
 **Maven:**
@@ -71,7 +70,7 @@ implementation 'org.contextmapper:context-mapper-dsl:6.6.0'
 <dependency>
   <groupId>org.contextmapper</groupId>
   <artifactId>context-mapper-dsl</artifactId>
-  <version>6.6.0</version>
+  <version>6.7.0</version>
 </dependency>
 ```
 In our [context-mapper-standalone-example](https://github.com/ContextMapper/context-mapper-standalone-example) repository you find an example project showing how to include the library within your project. It further contains code examples illustrating how to use the CML models and the generator tools (PlantUML, MDSL, etc.).
@@ -108,18 +107,8 @@ To build the standalone projects only, you can use the Gradle Wrapper:
 ### Setup Eclipse IDE
 Since this is an Xtext project you need an Eclipse IDE to work on it. Download the **Eclipse IDE for Java and DSL Developers** from [here](https://www.eclipse.org/downloads/packages/). The latest version of Eclipse we worked with is [2019-12](https://www.eclipse.org/downloads/packages/release/2019-12/r/eclipse-ide-java-and-dsl-developers).
 
-#### Additional requirements
-Before importing the project you need to install the **Tycho Configurator** m2e connector. This can be done by following these steps:
-
-1. Start your Eclipse
-2. Open the maven preferences page: _Window -> Preferences -> Maven_
-3. Under _Discovery_ press the button _Open Catalog_ and search for _Tycho_. You should find the _Tycho Configurator_.
-4. Select the Configurator and press _Finish_.
-5. An eclipse installation wizard will appear. Go through the wizard to finish the installation and restart eclipse.
-
-
 #### Importing the project
-After having installed the Tycho Configurator you can import the project with as an existing maven project (_Import -> Existing Maven Project_).
+You can import the project with as an existing maven project (_Import -> Existing Maven Project_).
 
 #### Build in Eclipse
 After importing the project you will have lots of build errors. This is because you have to generate some Xtext sources first. There exists an eclipse launch configuration called 'GenerateContextMappingDSLInfrastructure' delivered with the project. Run this launch configuration (yes, even if there exist build errors). As soon this has completed, execute a clean build with _Project -> Clean... -> Clean all projects_. 
