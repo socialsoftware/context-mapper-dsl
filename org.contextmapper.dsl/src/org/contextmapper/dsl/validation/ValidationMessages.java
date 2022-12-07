@@ -28,20 +28,26 @@ public class ValidationMessages {
 	public static final String OWNER_BC_IS_NOT_TEAM = "'%s' is not a team. The owner attribute must refer to a Bounded Context representing a team (type = TEAM)!";
 	public static final String AGGREGATE_CAN_ONLY_HAVE_ONE_AGGREGATE_ROOT = "Your aggregate '%s' contains multiple aggregate roots. An aggregate must only contain one root.";
 	public static final String AGGREGATE_CAN_ONLY_HAVE_ONE_STATES_ENUM = "Your aggregate '%s' contains multiple enums that define its states. Ensure that only one enum declares the states of the Aggregate.";
-	public static final String MAPPED_ENTITY_MUST_BE_AGGREGATE_ROOT = "Mapped Entity '%s' must be aggregate root.";
 	public static final String MAPPED_ENTITY_MUST_HAVE_A_KEY_ATTRIBUTE = "Mapped Entity '%s' must have a key attribute.";
 	public static final String MAPPED_BOUNDED_CONTEXT_DOES_NOT_EXIST = "Mapped Bounded Countext '%s' does not exist.";
 	public static final String MAPPED_BOUNDED_CONTEXT_IS_NOT_UPSTREAM = "Mapped Bounded Countext '%s' is not upstream.";
 	public static final String MAPPED_AGGREGATE_DOES_NOT_BELONG_TO_MAPPED_BOUNDED_CONTEXT = "Mapped Aggregate '%s' does not belong to mapped bounded context.";
 	public static final String MAPPED_ENTITY_DOES_NOT_BELONG_TO_MAPPED_AGGREGATE = "Mapped Entity '%s' does not belong to mapped aggregate.";
-	public static final String MAPPING_ENTITY_CANNOT_BE_AGGREGATE_ROOT = "Mapping Entity '%s' cannot be aggregate root.";
+	public static final String MAPPED_ATTRIBUTE_DOES_NOT_BELONG_TO_MAPPED_ENTITY = "Mapped Attribute '%s' does not belong to mapped entity.";
+	public static final String AGGREGATE_ROOT_ENTITY_AND_ITS_KEY_ATTRIBUTE_SHOULD_BE_MAPPED = "Aggregate '%s' root entity and its key attribute should be mapped.";
+	public static final String AGGREGATE_ROOT_CANNOT_USE_MAPPING = "Aggregate root '%s' cannot use a mapping.";
+	public static final String ENTITY_MAPPING_DOES_NOT_EXIST_FOR_USE = "Entity '%s' is using an undeclared anti corruption mapping.";
+	public static final String ENTITY_ATTRIBUTE_USES_DO_NOT_USE_KEY_ATTRIBUTE = "Entity used attributes do not use key attribute '%s'.";
+	public static final String ATTRIBUTE_USES_BUT_ENTITY_DOES_NOT = "Attribute '%s' use but entity does not define mapping.";
+	public static final String ATTRIBUTE_USES_VARIABLE_NOT_DEFINED = "Attribute used variable different from declared variable '%s'.";
+	public static final String ATTRIBUTE_USES_ATTRIBUTE_NOT_DEFINED = "Used Attribute not declared in AntiCorruptionMapping '%s'.";
+	public static final String ATTRIBUTE_TYPE_DOES_NOT_CONFORM_ATTRIBUTE_USED_TYPE = "Attribute type does not conform to used attribute type '%s'.";
 	public static final String ALIAS_IN_MAPPING_IS_DUPLICATED = "Alias %s in mapping is duplicated";
 	public static final String REFERENCE_IN_PATH_IS_NOT_ENTITY = "Reference %s in path is not entity";
 	public static final String REFERENCE_IN_PATH_IS_NOT_CORRECT_ENTITY_REFERENCE = "Reference %s in path is not a reference of the previous entity";
 	public static final String ALIAS_NOT_DECLARED = "Alias %s not declared";
 	public static final String ATTRIBUTE_IN_PATH_IS_NOT_CORRECT_ENTITY_REFERENCE = "Attribute %s in path is not a reference of the previous entity";
 	public static final String ATTRIBUTE_MAPPING_NOT_CONFORM_TYPES = "Attribute map type %s does not conform";
-	public static final String KEY_ATTRIBUTE_IS_NOT_MAPPED = "Key attribute is not mapped";
 	public static final String DUPLICATED_MAPPING_ATTRIBUTES = "There are duplicated mapping attributes";
 	public static final String ALREADY_IMPLEMENTED_SUBDOMAIN = "The subdomain '%s' is already implemented through its domain '%s'.";
 	public static final String MULTIPLE_DOMAINS_IMPLEMENTED = "Are you sure you want to implement multiple Domains within one Bounded Context? A Bounded Context should typically implement only a part of your Domain; one or multiple Subdomains.";
@@ -51,6 +57,7 @@ public class ValidationMessages {
 
 	/* Uniqueness problems */
 	public static final String BOUNDED_CONTEXT_NAME_NOT_UNIQUE = "Multiple bounded contexts with the name '%s' have been declared.";
+	public static final String ANTICORRUPTIONMAPPING_NAME_NOT_UNIQUE = "Multiple anti corruption mappings with the name '%s' have been declared.";
 	public static final String AGGREGATE_NAME_NOT_UNIQUE = "Multiple aggregates with the name '%s' have been declared.";
 	public static final String MODULE_NAME_NOT_UNIQUE = "Duplicate name. There is already an existing Module named '%s'.";
 	public static final String USE_CASE_NAME_NOT_UNIQUE = "Multiple use cases with the name '%s' have been declared.";

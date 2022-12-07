@@ -53,6 +53,7 @@ BoundedContext:
 	)
 	(
 		OPEN
+			(antiCorruptionMappings+=AntiCorruptionMapping)*
 			(('domainVisionStatement' ('=')? domainVisionStatement=STRING)? &
 			('type' ('=')? type=BoundedContextType)? &
 			(('responsibilities' ('=')? responsibilities+=STRING) ("," responsibilities+=STRING)*)? &
@@ -65,6 +66,46 @@ BoundedContext:
 			(aggregates += Aggregate)*)
 		CLOSE
 	)?
+;
+
+AntiCorruptionMapping :
+	'AntiCorruptionMapping' name=ID 
+	'mapping' boundedContext=[BoundedContext] '::' aggregate=[Aggregate]  
+		OPEN
+			(attributeMappings+=AttributeMapping)*
+			('InterInvariants' 
+				(interInvariants+=InterInvariant)+
+			)?
+		CLOSE
+;
+
+
+AttributeMapping :
+	((collectionType=CollectionType"<" type=Type ">") | type=Type) name=ID ("maps" entityAttribute=EntityAttribute)?
+;
+
+EntityAttribute :
+	entity=[tacticdsl::Entity] "." attribute=[tacticdsl::Attribute]
+;
+
+//AliasDeclaration :
+//	"alias" name=ID "in" referencePath=ReferencePath
+//;
+//
+//ReferencePath :
+//	{ReferencePath} "root" ("." references+=[tacticdsl::Reference])*
+//;
+//
+//AttributePath :
+//	entity=[tacticdsl::Entity] ("." references+=[tacticdsl::Reference])* "." attribute=[tacticdsl::Attribute]
+//;
+
+InterInvariant :
+	name=ID ':' booleanExpression=BooleanExpression
+;
+
+BooleanExpression :
+	parts+=(ID | '(' | ')' | '->' | '>' | '<' | '==' | '.'| '&&' | '||' )+
 ;
 
 DomainPart:
@@ -193,7 +234,12 @@ Aggregate :
      (resources+=Resource) |
      (consumers+=Consumer) |
      (domainObjects+=SimpleDomainObject))*
+     ('IntraInvariants' (intraInvariants+=IntraInvariant)+)?
   CLOSE)?
+;
+
+IntraInvariant :
+	name=ID ':' booleanExpression=BooleanExpression
 ;
 
 Application:

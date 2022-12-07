@@ -206,9 +206,9 @@ Entity :
   (comment=ML_COMMENT)?
   (doc=STRING)?
   (abstract?="abstract")? "Entity" name=ID ("extends" (("@"extends=[Entity]) | (extendsName=JavaIdentifier)))?
-  ("with" ("@")?traits+=[Trait])* ("{"
+  ("with" ("@")?traits+=[Trait])* 
+  (uses?="uses" variable=ID "from" antiCorruptionMapping=ID)?	("{"
     ("package" "=" package=JavaIdentifier )?
-    ("mapping" mapping=EntityMapping)?
     (((notOptimisticLocking?=NOT "optimisticLocking") | ("optimisticLocking"))? &
      ((notAuditable?=NOT "auditable") | ("auditable"))? &
      ((cache?="cache") | (NOT "cache"))? &
@@ -230,33 +230,6 @@ Entity :
      (associations+=Association))*
     (repository=Repository)?
   "}")?;
-  
-EntityMapping :
-	boundedContext=ID "::" aggregate=ID "::" entity=[Entity] "{"
-	(aliasDeclarations+=AliasDeclaration)*
-	(attributeMappings+=AttributeMapping)+ 
-    "}"
-;
-
-AliasDeclaration :
-	"alias" name=ID "in" referencePath=ReferencePath
-;
-
-ReferencePath :
-	{ReferencePath} "root" ("." references+=[Reference])*
-;
-
-AttributeMapping :
-	attribute=Attribute "maps" attributePath=AttributePath
-;
-
-AttributePath :
-	attributePathHead=AttributePathHead ("." references+=[Reference])* "." attribute=[Attribute]
-;
-
-AttributePathHead :
-	(root="root" | alias=[AliasDeclaration])
-;
 
 ValueObject :
   (comment=ML_COMMENT)?
@@ -400,6 +373,7 @@ BasicType :
 Attribute :
   (doc=STRING)?
   (visibility=Visibility)? ((collectionType=CollectionType"<" type=Type ">") | type=Type) name=ID
+  	(uses?="=" variable=ID "." usesAttribute=ID)?
     ((key?="key")? &
      ((notChangeable?=NOT "changeable") | ("changeable"))? &
      ((required?="required") | (NOT "required"))? &

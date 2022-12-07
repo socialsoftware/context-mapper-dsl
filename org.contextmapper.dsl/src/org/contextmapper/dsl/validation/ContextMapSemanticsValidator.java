@@ -26,20 +26,12 @@ import static org.contextmapper.dsl.contextMappingDSL.ContextMappingDSLPackage.L
 import static org.contextmapper.dsl.contextMappingDSL.ContextMappingDSLPackage.Literals.UPSTREAM_DOWNSTREAM_RELATIONSHIP__UPSTREAM;
 import static org.contextmapper.dsl.contextMappingDSL.ContextMappingDSLPackage.Literals.UPSTREAM_DOWNSTREAM_RELATIONSHIP__UPSTREAM_EXPOSED_AGGREGATES;
 import static org.contextmapper.dsl.validation.ValidationMessages.EXPOSED_AGGREGATE_NOT_PART_OF_UPSTREAM_CONTEXT;
-import static org.contextmapper.dsl.validation.ValidationMessages.MAPPED_BOUNDED_CONTEXT_DOES_NOT_EXIST;
-import static org.contextmapper.dsl.validation.ValidationMessages.MAPPED_BOUNDED_CONTEXT_IS_NOT_UPSTREAM;
-import static org.contextmapper.dsl.validation.ValidationMessages.MAPPED_AGGREGATE_DOES_NOT_BELONG_TO_MAPPED_BOUNDED_CONTEXT;
-import static org.contextmapper.dsl.validation.ValidationMessages.MAPPED_ENTITY_DOES_NOT_BELONG_TO_MAPPED_AGGREGATE;
 import static org.contextmapper.dsl.validation.ValidationMessages.ORGANIZATIONAL_MAP_DOES_NOT_CONTAIN_TEAM;
 import static org.contextmapper.dsl.validation.ValidationMessages.RELATIONSHIP_CONTEXT_NOT_ON_MAP_ERROR_MESSAGE;
 import static org.contextmapper.dsl.validation.ValidationMessages.SYSTEM_LANDSCAPE_MAP_CONTAINS_TEAM;
-import static org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage.Literals.ENTITY__MAPPING;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
-
-import javax.management.MalformedObjectNameException;
 
 import org.contextmapper.dsl.contextMappingDSL.Aggregate;
 import org.contextmapper.dsl.contextMappingDSL.BoundedContext;
@@ -49,13 +41,10 @@ import org.contextmapper.dsl.contextMappingDSL.SculptorModule;
 import org.contextmapper.dsl.contextMappingDSL.Relationship;
 import org.contextmapper.dsl.contextMappingDSL.SymmetricRelationship;
 import org.contextmapper.dsl.contextMappingDSL.UpstreamDownstreamRelationship;
-import org.contextmapper.tactic.dsl.tacticdsl.Entity;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.xtext.validation.AbstractDeclarativeValidator;
 import org.eclipse.xtext.validation.Check;
 import org.eclipse.xtext.validation.EValidatorRegistrar;
-import org.jgrapht.alg.util.AliasMethodSampler;
 
 public class ContextMapSemanticsValidator extends AbstractDeclarativeValidator {
 
@@ -121,78 +110,6 @@ public class ContextMapSemanticsValidator extends AbstractDeclarativeValidator {
 				if (TEAM.equals(bc.getType()))
 					error(String.format(SYSTEM_LANDSCAPE_MAP_CONTAINS_TEAM), map, CONTEXT_MAP__BOUNDED_CONTEXTS);
 			}
-		}
-	}
-	
-	@Check
-	public void validateMappedEntities(final ContextMap map) {
-		Set<String> boundedContextNames = map.getBoundedContexts().stream()
-			.map(BoundedContext::getName)
-			.collect(Collectors.toSet());
-		
-		Set<UpstreamDownstreamRelationship> upstreamDownstreamRelationships = map.getRelationships().stream()
-				.filter(UpstreamDownstreamRelationship.class::isInstance)
-				.map(UpstreamDownstreamRelationship.class::cast)
-				.collect(Collectors.toSet());
-		
-		for (BoundedContext boundedContext: map.getBoundedContexts()) {
-			for (Aggregate aggregate: boundedContext.getAggregates()) {
-				aggregate.getDomainObjects().stream()
-					.filter(Entity.class::isInstance)
-					.map(Entity.class::cast)
-					.filter(entity -> entity.getMapping() != null)
-					.forEach(entity -> {
-						checkMappedBoundedContextExists(boundedContextNames, entity);
-						checkMappedBoundedContextIsUpstream(upstreamDownstreamRelationships, boundedContext, entity);
-						checkMappedAggregateBelongsToBoundedContext(map.getBoundedContexts(), entity);
-						checkMappedEntityBelongsToAggregate(map.getBoundedContexts(), entity);
-					}); 
-			}
-		}
-	}
-
-	private void checkMappedBoundedContextExists(Set<String> boundedContextNames, Entity entity) {
-		if (!boundedContextNames.contains(entity.getMapping().getBoundedContext())) {
-			error(String.format(MAPPED_BOUNDED_CONTEXT_DOES_NOT_EXIST, entity.getMapping().getBoundedContext()), 
-					entity, ENTITY__MAPPING);
-		}
-	}
-
-	private void checkMappedBoundedContextIsUpstream(
-			Set<UpstreamDownstreamRelationship> upstreamDownstreamRelationships, BoundedContext boundedContext,
-			Entity entity) {
-		String mappingBoundedContextName = boundedContext.getName();
-		String mappedBoundedContextName = entity.getMapping().getBoundedContext();
-		
-		 if (!upstreamDownstreamRelationships.stream()
-			.anyMatch(relationship -> relationship.getDownstream().getName().equals(mappingBoundedContextName)
-									&& relationship.getUpstream().getName().equals(mappedBoundedContextName))) {
-			 error(String.format(MAPPED_BOUNDED_CONTEXT_IS_NOT_UPSTREAM, entity.getMapping().getBoundedContext()), 
-						entity, ENTITY__MAPPING);
-		 }
-	}
-	
-	private void checkMappedAggregateBelongsToBoundedContext(EList<BoundedContext> boundedContexts, Entity entity) {
-		if (boundedContexts.stream()
-				.filter(boundedContext -> boundedContext.getName().equals(entity.getMapping().getBoundedContext()))
-				.flatMap(boundedContext -> boundedContext.getAggregates().stream())
-				.noneMatch(aggregate -> aggregate.getName().equals(entity.getMapping().getAggregate()))) {
-			error(String.format(MAPPED_AGGREGATE_DOES_NOT_BELONG_TO_MAPPED_BOUNDED_CONTEXT, entity.getMapping().getAggregate()), 
-						entity, ENTITY__MAPPING);
-		}
-	}
-
-	private void checkMappedEntityBelongsToAggregate(EList<BoundedContext> boundedContexts, Entity entity) {
-		if (boundedContexts.stream()
-				.filter(boundedContext -> boundedContext.getName().equals(entity.getMapping().getBoundedContext()))
-				.flatMap(boundedContext -> boundedContext.getAggregates().stream())
-				.filter(aggregate -> aggregate.getName().equals(entity.getMapping().getAggregate()))
-				.flatMap(aggregate -> aggregate.getDomainObjects().stream())
-				.filter(Entity.class::isInstance)
-				.map(Entity.class::cast)
-				.noneMatch(entity1 -> entity1.equals(entity.getMapping().getEntity()))) {
-			error(String.format(MAPPED_ENTITY_DOES_NOT_BELONG_TO_MAPPED_AGGREGATE, entity.getMapping().getEntity().getName()), 
-						entity, ENTITY__MAPPING);
 		}
 	}
 
