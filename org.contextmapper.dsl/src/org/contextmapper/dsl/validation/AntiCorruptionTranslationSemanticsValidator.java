@@ -22,6 +22,7 @@ import static org.contextmapper.dsl.validation.ValidationMessages.MAPPED_AGGREGA
 import static org.contextmapper.dsl.validation.ValidationMessages.MAPPED_ENTITY_DOES_NOT_BELONG_TO_MAPPED_AGGREGATE;
 import static org.contextmapper.dsl.validation.ValidationMessages.MAPPED_ATTRIBUTE_DOES_NOT_BELONG_TO_MAPPED_ENTITY;
 import static org.contextmapper.dsl.validation.ValidationMessages.AGGREGATE_ROOT_ENTITY_AND_ITS_KEY_ATTRIBUTE_SHOULD_BE_MAPPED;
+import static org.contextmapper.dsl.validation.ValidationMessages.DUPLICATED_INVARIANT_NAMES;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -138,6 +139,20 @@ public class AntiCorruptionTranslationSemanticsValidator extends AbstractCMLVali
 				if (names.contains(name)) {
 					error(String.format(DUPLICATED_TRANSLATION_ATTRIBUTES, name), 
 							attributeTranslation, ContextMappingDSLPackage.Literals.ATTRIBUTE_TRANSLATION__NAME);
+				}
+				names.add(name);
+			});
+	}
+	
+	@Check
+	public void validateUniqueInterInvariantNames(final AntiCorruptionTranslation antiCorruptionTranslation) {
+		Set<String> names = new HashSet<>();
+		antiCorruptionTranslation.getInterInvariants()
+			.forEach(interInvariant -> {
+				String name = interInvariant.getName();
+				if (names.contains(name)) {
+					error(String.format(DUPLICATED_INVARIANT_NAMES, name), 
+							interInvariant, ContextMappingDSLPackage.Literals.INTER_INVARIANT__NAME);
 				}
 				names.add(name);
 			});

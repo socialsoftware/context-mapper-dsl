@@ -45,6 +45,7 @@ public class ValidationMessages {
 	public static final String PROPERTY_IN_PATH_IS_NOT_CORRECT_ENTITY_PROPERTY = "Property %s in path is not a correct entity property";
 	public static final String ATTRIBUTE_TRANSLATION_NOT_CONFORM_TYPES = "Attribute map type %s does not conform";
 	public static final String DUPLICATED_TRANSLATION_ATTRIBUTES = "There are duplicated translation attributes";
+	public static final String DUPLICATED_INVARIANT_NAMES = "There are duplicated invariant names %s";
 	public static final String METHOD_REQUIRES_COLLECTION = "Method requires collection";
 	public static final String VARIABLE_ALREADY_DECLARED_IN_SCOPE = "Variable already declared in scope";
 

@@ -17,13 +17,18 @@ package org.contextmapper.dsl.validation;
 
 import static org.contextmapper.dsl.validation.ValidationMessages.AGGREGATE_CAN_ONLY_HAVE_ONE_AGGREGATE_ROOT;
 import static org.contextmapper.dsl.validation.ValidationMessages.AGGREGATE_CAN_ONLY_HAVE_ONE_STATES_ENUM;
+import static org.contextmapper.dsl.validation.ValidationMessages.DUPLICATED_INVARIANT_NAMES;
 import static org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage.Literals.DOMAIN_OBJECT__AGGREGATE_ROOT;
 import static org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage.Literals.ENUM__DEFINES_AGGREGATE_LIFECYCLE;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.contextmapper.dsl.contextMappingDSL.Aggregate;
+import org.contextmapper.dsl.contextMappingDSL.AntiCorruptionTranslation;
+import org.contextmapper.dsl.contextMappingDSL.ContextMappingDSLPackage;
 import org.contextmapper.tactic.dsl.tacticdsl.DomainObject;
 import org.contextmapper.tactic.dsl.tacticdsl.Enum;
 import org.eclipse.xtext.validation.AbstractDeclarativeValidator;
@@ -59,6 +64,20 @@ public class AggregateSemanticsValidator extends AbstractDeclarativeValidator {
 				error(String.format(AGGREGATE_CAN_ONLY_HAVE_ONE_STATES_ENUM, aggregate.getName()), enumm, ENUM__DEFINES_AGGREGATE_LIFECYCLE);
 			}
 		}
+	}
+	
+	@Check
+	public void validateUniqueIntraInvariantNames(final Aggregate aggregate) {
+		Set<String> names = new HashSet<>();
+		aggregate.getIntraInvariants()
+			.forEach(intraInvariant -> {
+				String name = intraInvariant.getName();
+				if (names.contains(name)) {
+					error(String.format(DUPLICATED_INVARIANT_NAMES, name), 
+							intraInvariant, ContextMappingDSLPackage.Literals.INTRA_INVARIANT__NAME);
+				}
+				names.add(name);
+			});
 	}
 
 }
