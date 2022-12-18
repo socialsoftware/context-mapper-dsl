@@ -15,23 +15,23 @@
  */
 package org.contextmapper.dsl.validation;
 
-import static org.contextmapper.dsl.validation.ValidationMessages.AGGREGATE_ROOT_CANNOT_USE_MAPPING;
-import static org.contextmapper.dsl.validation.ValidationMessages.ENTITY_MAPPING_DOES_NOT_EXIST_FOR_USE;
+import static org.contextmapper.dsl.validation.ValidationMessages.AGGREGATE_ROOT_CANNOT_USE_TRANSLATION;
+import static org.contextmapper.dsl.validation.ValidationMessages.ENTITY_TRANSLATION_DOES_NOT_EXIST_FOR_USE;
 import static org.contextmapper.dsl.validation.ValidationMessages.ATTRIBUTE_USES_BUT_ENTITY_DOES_NOT;
 import static org.contextmapper.dsl.validation.ValidationMessages.ATTRIBUTE_USES_VARIABLE_NOT_DEFINED;
 import static org.contextmapper.dsl.validation.ValidationMessages.ATTRIBUTE_USES_ATTRIBUTE_NOT_DEFINED;
 import static org.contextmapper.dsl.validation.ValidationMessages.ATTRIBUTE_TYPE_DOES_NOT_CONFORM_ATTRIBUTE_USED_TYPE;
 import static org.contextmapper.dsl.validation.ValidationMessages.ENTITY_ATTRIBUTE_USES_DO_NOT_USE_KEY_ATTRIBUTE;
 import static org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage.Literals.DOMAIN_OBJECT__AGGREGATE_ROOT;
-import static org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage.Literals.ENTITY__ANTI_CORRUPTION_MAPPING;
+import static org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage.Literals.ENTITY__ANTI_CORRUPTION_TRANSLATION;
 import static org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage.Literals.ATTRIBUTE__USES;
 import static org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage.Literals.ATTRIBUTE__VARIABLE;
 import static org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage.Literals.ATTRIBUTE__USES_ATTRIBUTE;
 import static org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage.Literals.ATTRIBUTE__TYPE;
 
 import org.contextmapper.dsl.contextMappingDSL.Aggregate;
-import org.contextmapper.dsl.contextMappingDSL.AntiCorruptionMapping;
-import org.contextmapper.dsl.contextMappingDSL.AttributeMapping;
+import org.contextmapper.dsl.contextMappingDSL.AntiCorruptionTranslation;
+import org.contextmapper.dsl.contextMappingDSL.AttributeTranslation;
 import org.contextmapper.dsl.contextMappingDSL.BoundedContext;
 import org.contextmapper.tactic.dsl.tacticdsl.Attribute;
 import org.contextmapper.tactic.dsl.tacticdsl.Entity;
@@ -47,31 +47,33 @@ public class EntitySemanticsValidator extends AbstractCMLValidator {
 	}
 	
 	@Check
-	public void ValidateAggregateRootDoesNotUseMapping(final Entity entity) {
+	public void ValidateAggregateRootDoesNotUseTranslation(final Entity entity) {
 		if (entity.isAggregateRoot() && entity.isUses()) {
-			error(String.format(AGGREGATE_ROOT_CANNOT_USE_MAPPING, entity.getName()), 
+			error(String.format(AGGREGATE_ROOT_CANNOT_USE_TRANSLATION, entity.getName()), 
 					entity, DOMAIN_OBJECT__AGGREGATE_ROOT);
 		}
 	}
 	
 	@Check
-	public void ValidateWellFormedEntityUsesMapping(final Entity entity) {
-		Aggregate aggregate = (Aggregate) entity.eContainer();
-		BoundedContext boundedContext = (BoundedContext) aggregate.eContainer();
-		
-		if (entity.isUses() && boundedContext.getAntiCorruptionMappings().stream()
-			.noneMatch(antiCorruptionMapping -> antiCorruptionMapping.getName().equals(entity.getAntiCorruptionMapping()))) {
-			error(String.format(ENTITY_MAPPING_DOES_NOT_EXIST_FOR_USE, entity.getName()), 
-					entity, ENTITY__ANTI_CORRUPTION_MAPPING);
+	public void ValidateWellFormedEntityUsesTranslation(final Entity entity) {
+		if (entity.isUses()) {
+			Aggregate aggregate = (Aggregate) entity.eContainer();
+			BoundedContext boundedContext = (BoundedContext) aggregate.eContainer();
+			
+			if (boundedContext.getAntiCorruptionTranslations().stream()
+				.noneMatch(antiCorruptionTranslation -> antiCorruptionTranslation.getName().equals(entity.getAntiCorruptionTranslation()))) {
+				error(String.format(ENTITY_TRANSLATION_DOES_NOT_EXIST_FOR_USE, entity.getName()), 
+						entity, ENTITY__ANTI_CORRUPTION_TRANSLATION);
+			}
 		}
 	}
 	
 	@Check
-	public void ValidateMappingKeyAttributeIsUsed(final Entity entity) {
+	public void ValidateTranslationKeyAttributeIsUsed(final Entity entity) {
 		Aggregate aggregate = (Aggregate) entity.eContainer();
 		BoundedContext boundedContext = (BoundedContext) aggregate.eContainer();
-		AntiCorruptionMapping antiCorruptionMapping = getAntiCorruptionMappingByName(boundedContext, entity.getAntiCorruptionMapping());
-		String keyAttributeName = antiCorruptionMapping.getAggregate().getDomainObjects().stream()
+		AntiCorruptionTranslation antiCorruptionTranslation = getAntiCorruptionTranslationByName(boundedContext, entity.getAntiCorruptionTranslation());
+		String keyAttributeName = antiCorruptionTranslation.getAggregate().getDomainObjects().stream()
 				.filter(Entity.class::isInstance)
 				.map(Entity.class::cast)
 				.filter(Entity::isAggregateRoot)
@@ -80,22 +82,22 @@ public class EntitySemanticsValidator extends AbstractCMLValidator {
 				.map(Attribute::getName)
 				.findAny()
 				.orElse(null);
-		AttributeMapping keyAttributeMapping = getAntiCorruptionMappingAttributeByName(antiCorruptionMapping, keyAttributeName);
+		AttributeTranslation keyAttributeTranslation = getAntiCorruptionTranslationAttributeByName(antiCorruptionTranslation, keyAttributeName);
 				
 		if (entity.isUses() &&
 			entity.getAttributes().stream()
 				.filter(Attribute::isUses)
-				.noneMatch(attribute -> attribute.getName().equals(keyAttributeMapping.getName()))) {
-			error(String.format(ENTITY_ATTRIBUTE_USES_DO_NOT_USE_KEY_ATTRIBUTE, keyAttributeMapping.getName()), 
-					entity, ENTITY__ANTI_CORRUPTION_MAPPING);
+				.noneMatch(attribute -> attribute.getName().equals(keyAttributeTranslation.getName()))) {
+			error(String.format(ENTITY_ATTRIBUTE_USES_DO_NOT_USE_KEY_ATTRIBUTE, keyAttributeTranslation.getName()), 
+					entity, ENTITY__ANTI_CORRUPTION_TRANSLATION);
 		}
 	}
 
 	@Check
-	public void ValidateWellFormedAttributesUsesMapping(final Entity entity) {	
+	public void ValidateWellFormedAttributesUsesTranslation(final Entity entity) {	
 		Aggregate aggregate = (Aggregate) entity.eContainer();
 		BoundedContext boundedContext = (BoundedContext) aggregate.eContainer();
-		AntiCorruptionMapping antiCorruptionMapping = getAntiCorruptionMappingByName(boundedContext, entity.getAntiCorruptionMapping());
+		AntiCorruptionTranslation antiCorruptionTranslation = getAntiCorruptionTranslationByName(boundedContext, entity.getAntiCorruptionTranslation());
 
 		entity.getAttributes().stream()
 			.filter(Attribute::isUses)
@@ -109,14 +111,14 @@ public class EntitySemanticsValidator extends AbstractCMLValidator {
 						error(String.format(ATTRIBUTE_USES_VARIABLE_NOT_DEFINED, entity.getVariable()), 
 								attribute, ATTRIBUTE__VARIABLE);
 					}		
-					AttributeMapping attributeMapping = getAntiCorruptionMappingAttributeByName(antiCorruptionMapping, 
+					AttributeTranslation attributeTranslation = getAntiCorruptionTranslationAttributeByName(antiCorruptionTranslation, 
 							attribute.getUsesAttribute());
-					if (attributeMapping == null) {
-						error(String.format(ATTRIBUTE_USES_ATTRIBUTE_NOT_DEFINED, antiCorruptionMapping.getName()), 
+					if (attributeTranslation == null) {
+						error(String.format(ATTRIBUTE_USES_ATTRIBUTE_NOT_DEFINED, antiCorruptionTranslation.getName()), 
 								attribute, ATTRIBUTE__USES_ATTRIBUTE);
 					} else {
-						if (!attributeMapping.getType().equals(attribute.getType())) {
-							error(String.format(ATTRIBUTE_TYPE_DOES_NOT_CONFORM_ATTRIBUTE_USED_TYPE, attributeMapping.getType()), 
+						if (!attributeTranslation.getType().equals(attribute.getType())) {
+							error(String.format(ATTRIBUTE_TYPE_DOES_NOT_CONFORM_ATTRIBUTE_USED_TYPE, attributeTranslation.getType()), 
 									attribute, ATTRIBUTE__TYPE);
 						}
 					}
@@ -124,72 +126,17 @@ public class EntitySemanticsValidator extends AbstractCMLValidator {
 			});
 	}
 	
-	private AntiCorruptionMapping getAntiCorruptionMappingByName(BoundedContext boundedContext, String name) {
-		return boundedContext.getAntiCorruptionMappings().stream()
-			.filter(antiCorruptionMapping -> antiCorruptionMapping.getName().equals(name))
+	private AntiCorruptionTranslation getAntiCorruptionTranslationByName(BoundedContext boundedContext, String name) {
+		return boundedContext.getAntiCorruptionTranslations().stream()
+			.filter(antiCorruptionTranslation -> antiCorruptionTranslation.getName().equals(name))
 			.findAny()
 			.orElse(null);
 	}
 
-	private AttributeMapping getAntiCorruptionMappingAttributeByName(AntiCorruptionMapping antiCorruptionMapping, String name) {
-		return antiCorruptionMapping.getAttributeMappings().stream()
-			.filter(attributeMapping -> attributeMapping.getName().equals(name))
+	private AttributeTranslation getAntiCorruptionTranslationAttributeByName(AntiCorruptionTranslation antiCorruptionTranslation, String name) {
+		return antiCorruptionTranslation.getAttributeTranslations().stream()
+			.filter(attributeTranslation -> attributeTranslation.getName().equals(name))
 			.findAny()
 			.orElse(null);
 	}
-
-	
-//	private Entity checkReferencePath(ReferencePath referencePath, Entity entity) {
-//		Entity currentEntity = entity.getMapping().getEntity();
-//		for (Reference reference: referencePath.getReferences()) {
-//			if (currentEntity.getReferences().contains(reference)) {
-//				if (!(reference.getDomainObjectType() instanceof Entity)) {
-//					error(String.format(REFERENCE_IN_PATH_IS_NOT_ENTITY, reference.getName()), 
-//							referencePath, REFERENCE_PATH__REFERENCES);
-//				} else {
-//					currentEntity = (Entity) reference.getDomainObjectType();
-//				}
-//			} else {
-//				error(String.format(REFERENCE_IN_PATH_IS_NOT_CORRECT_ENTITY_REFERENCE, reference.getName()), 
-//						referencePath, REFERENCE_PATH__REFERENCES);
-//			}
-//		}
-//		return currentEntity;
-//	}
-//	
-//	private Attribute checkAttributePath(AttributePath attributePath, Map<String, Entity> aliases, Entity entity) {
-//		Entity currentEntity;
-//		if (attributePath.getAttributePathHead().getRoot() != null) {
-//			currentEntity = entity.getMapping().getEntity();
-//		} else {
-//			currentEntity = aliases.get(attributePath.getAttributePathHead().getAlias().getName());
-//		}
-//		
-//		for (Reference reference: attributePath.getReferences()) {
-//			if (currentEntity.getReferences().contains(reference)) {
-//				if (!(reference.getDomainObjectType() instanceof Entity)) {
-//					error(String.format(REFERENCE_IN_PATH_IS_NOT_ENTITY, reference.getName()), 
-//							attributePath, ATTRIBUTE_PATH__REFERENCES);
-//				} else {
-//					currentEntity = (Entity) reference.getDomainObjectType();
-//				}
-//			} else {
-//				error(String.format(REFERENCE_IN_PATH_IS_NOT_CORRECT_ENTITY_REFERENCE, reference.getName()), 
-//						attributePath, ATTRIBUTE_PATH__REFERENCES);
-//			}
-//		}
-//		
-//		Attribute resultAttribute = currentEntity.getAttributes().stream()
-//				.filter(attribute -> attribute.getName().equals(attributePath.getAttribute().getName()))
-//				.findAny()
-//				.get();
-//				
-//		if (resultAttribute == null) {
-//			error(String.format(ATTRIBUTE_IN_PATH_IS_NOT_CORRECT_ENTITY_REFERENCE, attributePath.getAttribute().getName()), 
-//					attributePath, ATTRIBUTE_PATH__REFERENCES);
-//		}
-//		
-//		return resultAttribute;
-//	}	
-
 }

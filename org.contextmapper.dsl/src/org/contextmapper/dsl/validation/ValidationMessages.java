@@ -35,20 +35,36 @@ public class ValidationMessages {
 	public static final String MAPPED_ENTITY_DOES_NOT_BELONG_TO_MAPPED_AGGREGATE = "Mapped Entity '%s' does not belong to mapped aggregate.";
 	public static final String MAPPED_ATTRIBUTE_DOES_NOT_BELONG_TO_MAPPED_ENTITY = "Mapped Attribute '%s' does not belong to mapped entity.";
 	public static final String AGGREGATE_ROOT_ENTITY_AND_ITS_KEY_ATTRIBUTE_SHOULD_BE_MAPPED = "Aggregate '%s' root entity and its key attribute should be mapped.";
-	public static final String AGGREGATE_ROOT_CANNOT_USE_MAPPING = "Aggregate root '%s' cannot use a mapping.";
-	public static final String ENTITY_MAPPING_DOES_NOT_EXIST_FOR_USE = "Entity '%s' is using an undeclared anti corruption mapping.";
+	public static final String AGGREGATE_ROOT_CANNOT_USE_TRANSLATION = "Aggregate root '%s' cannot use a translation.";
+	public static final String ENTITY_TRANSLATION_DOES_NOT_EXIST_FOR_USE = "Entity '%s' is using an undeclared anti corruption translation.";
 	public static final String ENTITY_ATTRIBUTE_USES_DO_NOT_USE_KEY_ATTRIBUTE = "Entity used attributes do not use key attribute '%s'.";
-	public static final String ATTRIBUTE_USES_BUT_ENTITY_DOES_NOT = "Attribute '%s' use but entity does not define mapping.";
+	public static final String ATTRIBUTE_USES_BUT_ENTITY_DOES_NOT = "Attribute '%s' use but entity does not define translation.";
 	public static final String ATTRIBUTE_USES_VARIABLE_NOT_DEFINED = "Attribute used variable different from declared variable '%s'.";
-	public static final String ATTRIBUTE_USES_ATTRIBUTE_NOT_DEFINED = "Used Attribute not declared in AntiCorruptionMapping '%s'.";
+	public static final String ATTRIBUTE_USES_ATTRIBUTE_NOT_DEFINED = "Used Attribute not declared in AntiCorruptionTranslation '%s'.";
 	public static final String ATTRIBUTE_TYPE_DOES_NOT_CONFORM_ATTRIBUTE_USED_TYPE = "Attribute type does not conform to used attribute type '%s'.";
-	public static final String ALIAS_IN_MAPPING_IS_DUPLICATED = "Alias %s in mapping is duplicated";
-	public static final String REFERENCE_IN_PATH_IS_NOT_ENTITY = "Reference %s in path is not entity";
-	public static final String REFERENCE_IN_PATH_IS_NOT_CORRECT_ENTITY_REFERENCE = "Reference %s in path is not a reference of the previous entity";
-	public static final String ALIAS_NOT_DECLARED = "Alias %s not declared";
-	public static final String ATTRIBUTE_IN_PATH_IS_NOT_CORRECT_ENTITY_REFERENCE = "Attribute %s in path is not a reference of the previous entity";
-	public static final String ATTRIBUTE_MAPPING_NOT_CONFORM_TYPES = "Attribute map type %s does not conform";
-	public static final String DUPLICATED_MAPPING_ATTRIBUTES = "There are duplicated mapping attributes";
+	public static final String PROPERTY_IN_PATH_IS_NOT_CORRECT_ENTITY_PROPERTY = "Property %s in path is not a correct entity property";
+	public static final String ATTRIBUTE_TRANSLATION_NOT_CONFORM_TYPES = "Attribute map type %s does not conform";
+	public static final String DUPLICATED_TRANSLATION_ATTRIBUTES = "There are duplicated translation attributes";
+	public static final String METHOD_REQUIRES_COLLECTION = "Method requires collection";
+	public static final String VARIABLE_ALREADY_DECLARED_IN_SCOPE = "Variable already declared in scope";
+
+	public static final String INTRA_INVARIANT_CANNOT_CONTAIN_QUERY = "Intra Invariant cannot contain query %s";
+	public static final String INTRA_INVARIANT_CANNOT_CONTAIN_VAR = "Intra Invariant cannot contain var %s";
+	public static final String QUERY_ENTITY_DOES_NOT_BELONG_TO_AGGREGATE = "Query entity does not belong to aggregate %s";
+	public static final String QUERY_PARAM_IS_NOT_DECLARED = "Query param %s is not declared";
+	public static final String INTER_INVARIANT_CANNOT_CONTAIN_ROOT = "Inter Invariant cannot contain root";
+	public static final String BOOLEAN_EXPRESSION_INCORRECT_TYPE = "Expected a boolean expression but got %s";
+	public static final String COMPARISON_EXPRESSION_INCORRECT_TYPE = "Incompatible types %s in comparison expression";
+	public static final String IS_NOT_NUMERIC_TYPE = "%s is not numeric type";
+	public static final String TYPES_DO_NOT_CONFORM = "Types do not conform %s";
+	public static final String INVARIANT_EXPRESSION_MUST_BE_BOOLEAN = "Invariant expression must be boolean, instead of %s";
+	public static final String INTER_INVARIANT_ATTRIBUTE_NOT_DECLARED_IN_ANTICORRUPTION_TRANSLATION = "Inter Invariant attribute %s not declared in anticorruption translation";
+	public static final String METHOD_LOCAL_VARIABLE_NOT_DECLARED = "Method local variable %s not declared";
+	public static final String PATH_EXPRESSION_HEAD_MUST_BE_OBJECT = "Path expresssion head %s must be object";
+	public static final String TERNARY_EXPRESSION_CONDITION_MUST_BE_BOOLEAN = "Ternary expression condition must be boolean intead of %s";
+	public static final String TERNARY_EXPRESSION_THEN_CONDITION_MUST_BE_BOOLEAN = "Ternary expression true condition must be boolean intead of %s";
+	public static final String TERNARY_EXPRESSION_ELSE_CONDITION_MUST_BE_BOOLEAN = "Ternary expression else condition must be boolean intead of %s";
+	
 	public static final String ALREADY_IMPLEMENTED_SUBDOMAIN = "The subdomain '%s' is already implemented through its domain '%s'.";
 	public static final String MULTIPLE_DOMAINS_IMPLEMENTED = "Are you sure you want to implement multiple Domains within one Bounded Context? A Bounded Context should typically implement only a part of your Domain; one or multiple Subdomains.";
 	public static final String ORGANIZATIONAL_MAP_DOES_NOT_CONTAIN_TEAM = "Your Context Map is of the type ORGANIZATIONAL but does not contain Bounded Contexts of the type TEAM. This type of Context Map is intended to model team relationships.";
@@ -57,7 +73,7 @@ public class ValidationMessages {
 
 	/* Uniqueness problems */
 	public static final String BOUNDED_CONTEXT_NAME_NOT_UNIQUE = "Multiple bounded contexts with the name '%s' have been declared.";
-	public static final String ANTICORRUPTIONMAPPING_NAME_NOT_UNIQUE = "Multiple anti corruption mappings with the name '%s' have been declared.";
+	public static final String ANTICORRUPTIONTRANSLATION_NAME_NOT_UNIQUE = "Multiple anti corruption translations with the name '%s' have been declared.";
 	public static final String AGGREGATE_NAME_NOT_UNIQUE = "Multiple aggregates with the name '%s' have been declared.";
 	public static final String MODULE_NAME_NOT_UNIQUE = "Duplicate name. There is already an existing Module named '%s'.";
 	public static final String USE_CASE_NAME_NOT_UNIQUE = "Multiple use cases with the name '%s' have been declared.";

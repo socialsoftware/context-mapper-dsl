@@ -54,7 +54,7 @@ BoundedContext:
 	)
 	(
 		OPEN
-			(antiCorruptionMappings+=AntiCorruptionMapping)*
+			(AntiCorruptionTranslations+=AntiCorruptionTranslation)*
 			(('domainVisionStatement' ('=')? domainVisionStatement=STRING)? &
 			('type' ('=')? type=BoundedContextType)? &
 			(('responsibilities' ('=')? responsibilities+=STRING) ("," responsibilities+=STRING)*)? &
@@ -69,17 +69,17 @@ BoundedContext:
 	)?
 ;
 
-AntiCorruptionMapping :
-	'AntiCorruptionMapping' name=ID 
+AntiCorruptionTranslation :
+	'AntiCorruptionTranslation' name=ID 
 	'mapping' boundedContext=[BoundedContext] '::' aggregate=[Aggregate]  
 		OPEN
-			(attributeMappings+=AttributeMapping)*
+			(attributeTranslations+=AttributeTranslation)*
 			(interInvariants+=InterInvariant)*
 		CLOSE
 ;
 
 
-AttributeMapping :
+AttributeTranslation :
 	((collectionType=CollectionType"<" type=Type ">") | type=Type) name=ID ("maps" entityAttribute=EntityAttribute)?
 ;
 
@@ -448,54 +448,52 @@ BooleanExpression returns Expression:
   (({BooleanExpression.left=current} op=("||"|"&&"|"and"|"or")) right=Comparison)*;
 
 Comparison returns Expression:
-  Membership
-  (({Comparison.left=current} op=("<" | ">" | "<=" | ">=")) right=Membership)*;
-
-Membership returns Expression:
-  Equals
-  (({Membership.left=current} op=("in" | "not_in")) "[" right+=Expression(',' right+=Expression)* "]")*;
-
-Equals returns Expression:
   Addition
-  (({Equals.left=current} op=("==" | "!=" | "=~" | "!~" | "is")) right=Addition)*;
+  (({Comparison.left=current} op=("<" | ">" | "<=" | ">=" | "==" | "!=")) right=Addition)*;
+
+//Membership returns Expression:
+//  Equals
+//  (({Membership.left=current} op=("in" | "not_in")) "[" right+=Expression(',' right+=Expression)* "]")*;
+
+//Equals returns Expression:
+//  Addition
+//  (({Equals.left=current} op=("==" | "!=")) right=Addition)*;
 
 Addition returns Expression:
   Multiplication
-  (=>({Plus.left=current} '+' | {Minus.left=current} '-m')
-  right=Multiplication)*;
+  (=>({Addition.left=current} op=('+') | {Addition.left=current} op=('-m')) right=Multiplication)*;
 
 Multiplication returns Expression:
   Prefixed 
-  (({MultiOrDivOrMod.left=current} op=("*"|"/"|"%")) right=Prefixed)*;
+  (({Multiplication.left=current} op=("*"|"/"|"%")) right=Prefixed)*;
 
 Prefixed returns Expression:
-  {BooleanNegation} "!" expression=Atomic | /* right associativity */
-  {ArithmeticSigned} '-m' expression=Atomic | /* right associativity */
+  {BooleanNegation} "!" atomic=Atomic | /* right associativity */
+  {ArithmeticSigned} '-m' atomic=Atomic | /* right associativity */
   Atomic;
   //TODO: unary addition operator can be supported in ArithmeticSigned
 
 Atomic returns Expression:
   LiteralExpression |	
   TernaryExpression |
-  (final?='final')? pathExpression=PathExpression |
-  FunctionalExpression |
+  PathExpression |
 //  ArrayExpression |
   ParenthesizedExpression 
 //  {FunctionReference} ref=Function |
 //  {VariableReference} ref=Variable |
-//  {PropertyExpresssion} ref=PropertyExpression
+//  {PropertyExpression} ref=PropertyExpression
 ;
 
 LiteralExpression:
   {NumberLiteral} value=NUMBER |
   {NowLiteral} value='now' |
-//  {StringLiteral} value=STRING |
+  {StringLiteral} value=STRING |
   {NullLiteral} value= 'null' |
   {BooleanLiteral} value=('true'|'false')
 ;
 
 TernaryExpression:
-  'if' expression=BooleanExpression
+  'if' condition=BooleanExpression
   'then' truevalue=Atomic
   (=>'else' falsevalue=Atomic)?
   /**
@@ -504,54 +502,39 @@ TernaryExpression:
    */
 ;
 
-PathExpression returns Expression :
-	HeadElement ({PathExpresssion.ref=current} '.' tail=[tacticdsl::Property])*
+PathExpression:
+	headElement=HeadElement ('.' properties+=[tacticdsl::Property])*  ('.' methods+=Method)*
 ;
 
-HeadElement returns Expression :
-    {HeadElement} (var=ID | root='root' | query=Query) 
+HeadElement:
+    (var=ID | root?='root' | query=Query) 
 ;
 
-Query returns Expression :
-	{Query} entity=[tacticdsl::Entity] '(' param+=ID (',' param+=ID)* ')'
+Query:
+	{Query} entity=[tacticdsl::Entity] '(' params+=ID (',' params+=ID)* ')'
 ;
 
-FunctionalExpression returns Expression :
-	pathExpression=PathExpression ('.' methods+=Method)+
+Method returns Method:
+	SimpleMethod | 
+	ParametricMethod
 ;
 
-Method returns Expression:
-	{Expression} (simpleMethod=SimpleMethod | parametricMethod=ParametricMethod)
+SimpleMethod:
+	(final?='final' | count?='count' | distinct?='distinct')
 ;
 
-SimpleMethod returns Expression:
-	{Expresssion} ('count' | 'distinct')
-;
-
-ParametricMethod returns Expression:
-	AllMatch |
-	Filter |
-	Map
-;
-
-AllMatch returns Expression:
-	allMatch='allMatch(' variable=ID '->' booleanExpression=BooleanExpression ')'
-;
-
-Filter returns Expression:
-	filter='filter(' variable=ID '->' booleanExpression=BooleanExpression ')'
-;
-
-Map returns Expression:
-	map='map(' variable=ID '->' expression=Expression ')'
+ParametricMethod:
+	allMatch?='allMatch(' variable=ID '->' booleanExpression=BooleanExpression ')' |
+	filter?='filter(' variable=ID '->' booleanExpression=BooleanExpression ')' |
+	map?='map(' variable=ID '->' expression=Expression ')'
 ;
 
 //ArrayExpression returns Expression:
 //	{ArrayExpression} '[' expression+=Expression(',' expression+=Expression)* ']'
 //;
 //
-ParenthesizedExpression returns Expression:
-	'(' Expression ')'
+ParenthesizedExpression:
+	'(' expression=Expression ')'
 ;
 //
 //Function:

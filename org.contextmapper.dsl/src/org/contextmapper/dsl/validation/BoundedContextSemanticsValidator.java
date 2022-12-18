@@ -17,14 +17,14 @@ package org.contextmapper.dsl.validation;
 
 import static org.contextmapper.dsl.validation.ValidationMessages.ALREADY_IMPLEMENTED_SUBDOMAIN;
 import static org.contextmapper.dsl.validation.ValidationMessages.MULTIPLE_DOMAINS_IMPLEMENTED;
-import static org.contextmapper.dsl.validation.ValidationMessages.ANTICORRUPTIONMAPPING_NAME_NOT_UNIQUE;
+import static org.contextmapper.dsl.validation.ValidationMessages.ANTICORRUPTIONTRANSLATION_NAME_NOT_UNIQUE;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.contextmapper.dsl.contextMappingDSL.AntiCorruptionMapping;
+import org.contextmapper.dsl.contextMappingDSL.AntiCorruptionTranslation;
 import org.contextmapper.dsl.contextMappingDSL.BoundedContext;
 import org.contextmapper.dsl.contextMappingDSL.ContextMappingDSLPackage;
 import org.contextmapper.dsl.contextMappingDSL.Domain;
@@ -47,7 +47,7 @@ public class BoundedContextSemanticsValidator extends AbstractDeclarativeValidat
 
 		if (domains.isEmpty())
 			return;
-
+		
 		boundedContext.getImplementedDomainParts().stream().filter(domainPart -> domainPart instanceof Subdomain).map(domainPart -> (Subdomain) domainPart).forEach(subdomain -> {
 			Domain parentDomain = (Domain) subdomain.eContainer();
 			if (domains.contains(parentDomain))
@@ -69,12 +69,12 @@ public class BoundedContextSemanticsValidator extends AbstractDeclarativeValidat
 	}
 	
 	@Check
-	public void validateUniqueAntiCorruptionMappingName(final BoundedContext boundedContext) {
-		Set<String> antiCorruptionMappingName = new HashSet<>();
-		boundedContext.getAntiCorruptionMappings().forEach(antiCorruptionMapping -> {
-			if (!antiCorruptionMappingName.add(antiCorruptionMapping.getName())) {
-				error(String.format(ANTICORRUPTIONMAPPING_NAME_NOT_UNIQUE, antiCorruptionMapping.getName()), 
-						antiCorruptionMapping, ContextMappingDSLPackage.Literals.ANTI_CORRUPTION_MAPPING__NAME);
+	public void validateUniqueAntiCorruptionTranslationName(final BoundedContext boundedContext) {
+		Set<String> antiCorruptionTranslationName = new HashSet<>();
+		boundedContext.getAntiCorruptionTranslations().forEach(antiCorruptionTranslation -> {
+			if (!antiCorruptionTranslationName.add(antiCorruptionTranslation.getName())) {
+				error(String.format(ANTICORRUPTIONTRANSLATION_NAME_NOT_UNIQUE, antiCorruptionTranslation.getName()), 
+						antiCorruptionTranslation, ContextMappingDSLPackage.Literals.ANTI_CORRUPTION_TRANSLATION__NAME);
 			}
 		});
 	}
