@@ -74,7 +74,7 @@ AntiCorruptionTranslation :
 	'mapping' boundedContext=[BoundedContext] '::' aggregate=[Aggregate]  
 		OPEN
 			(attributeTranslations+=AttributeTranslation)*
-			(interInvariants+=InterInvariant)*
+			(interAggregateInvariants+=InterAggregateInvariant)*
 		CLOSE
 ;
 
@@ -87,8 +87,8 @@ EntityAttribute :
 	entity=[tacticdsl::Entity] "." attribute=[tacticdsl::Attribute]
 ;
 
-InterInvariant :
-	'InterInvariant' name=ID
+InterAggregateInvariant :
+	'InterAggregateInvariant' name=ID
 	OPEN
 		expression=BooleanExpression
 	CLOSE
@@ -220,12 +220,12 @@ Aggregate :
      (resources+=Resource) |
      (consumers+=Consumer) |
      (domainObjects+=SimpleDomainObject))*
-     (intraInvariants+=IntraInvariant)*
+     (intraAggregateInvariants+=IntraAggregateInvariant)*
   CLOSE)?
 ;
 
-IntraInvariant :
-	'IntraInvariant' name=ID
+IntraAggregateInvariant :
+	'IntraAggregateInvariant' name=ID
 	OPEN
 		expression=BooleanExpression
 	CLOSE

@@ -51,8 +51,8 @@ import org.contextmapper.dsl.contextMappingDSL.BooleanNegation;
 import org.contextmapper.dsl.contextMappingDSL.Comparison;
 import org.contextmapper.dsl.contextMappingDSL.ContextMappingDSLPackage;
 import org.contextmapper.dsl.contextMappingDSL.Expression;
-import org.contextmapper.dsl.contextMappingDSL.InterInvariant;
-import org.contextmapper.dsl.contextMappingDSL.IntraInvariant;
+import org.contextmapper.dsl.contextMappingDSL.InterAggregateInvariant;
+import org.contextmapper.dsl.contextMappingDSL.IntraAggregateInvariant;
 import org.contextmapper.dsl.contextMappingDSL.Method;
 import org.contextmapper.dsl.contextMappingDSL.Multiplication;
 import org.contextmapper.dsl.contextMappingDSL.NowLiteral;
@@ -107,22 +107,22 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 		Aggregate scopeAggregate = null;
 		Map<String, String> scopeVariables = new HashMap<>();
 		ScopeType scopeType;
-		IntraInvariant intraInvariant = null;
-		InterInvariant interInvariant = null;
+		IntraAggregateInvariant intraAggregateInvariant = null;
+		InterAggregateInvariant interAggregateInvariant = null;
 
-		if (expression.eContainer() instanceof InterInvariant) {
+		if (expression.eContainer() instanceof InterAggregateInvariant) {
 			scopeType = ScopeType.INTER; 
-			interInvariant = (InterInvariant) expression.eContainer();
-			AntiCorruptionTranslation antiCorruptionTranslation = (AntiCorruptionTranslation) interInvariant.eContainer();
+			interAggregateInvariant = (InterAggregateInvariant) expression.eContainer();
+			AntiCorruptionTranslation antiCorruptionTranslation = (AntiCorruptionTranslation) interAggregateInvariant.eContainer();
 			scopeAggregate = antiCorruptionTranslation.getAggregate();
 			antiCorruptionTranslation.getAttributeTranslations().stream()
 				.forEach(attributeTranslation -> {
 					scopeVariables.put(attributeTranslation.getName(), attributeTranslation.getType());
 				});
-		} else if (expression.eContainer() instanceof IntraInvariant) {
+		} else if (expression.eContainer() instanceof IntraAggregateInvariant) {
 			scopeType = ScopeType.INTRA;
-			intraInvariant = (IntraInvariant) expression.eContainer();
-			scopeAggregate = (Aggregate) intraInvariant.eContainer();
+			intraAggregateInvariant = (IntraAggregateInvariant) expression.eContainer();
+			scopeAggregate = (Aggregate) intraAggregateInvariant.eContainer();
 		} else {
 			return;
 		} 
@@ -133,10 +133,10 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 		
 		if (!areCompatibleTypes(type, BOOLEAN) && scopeType.equals(ScopeType.INTER)) {
 			error(String.format(INVARIANT_EXPRESSION_MUST_BE_BOOLEAN, type), 
-					interInvariant, ContextMappingDSLPackage.Literals.INTER_INVARIANT__EXPRESSION);
+					interAggregateInvariant, ContextMappingDSLPackage.Literals.INTER_AGGREGATE_INVARIANT__EXPRESSION);
 		} else if (!areCompatibleTypes(type, BOOLEAN) && scopeType.equals(ScopeType.INTRA)) {
 			error(String.format(INVARIANT_EXPRESSION_MUST_BE_BOOLEAN, type), 
-					intraInvariant, ContextMappingDSLPackage.Literals.INTRA_INVARIANT__EXPRESSION);
+					intraAggregateInvariant, ContextMappingDSLPackage.Literals.INTRA_AGGREGATE_INVARIANT__EXPRESSION);
 		}
 	}
 	
@@ -512,7 +512,7 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 		}
 		
 		if (scopeVariables.get(parametricMethod.getVariable()) != null) {
-			error(String.format(VARIABLE_ALREADY_DECLARED_IN_SCOPE, parametricMethod.getVariable()), 
+			error(String.format(	, parametricMethod.getVariable()), 
 					parametricMethod, ContextMappingDSLPackage.Literals.PARAMETRIC_METHOD__VARIABLE);
 			return result;
 		} 

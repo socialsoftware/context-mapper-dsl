@@ -67,14 +67,14 @@ public class AggregateSemanticsValidator extends AbstractDeclarativeValidator {
 	}
 	
 	@Check
-	public void validateUniqueIntraInvariantNames(final Aggregate aggregate) {
+	public void validateUniqueIntraAggregateInvariantNames(final Aggregate aggregate) {
 		Set<String> names = new HashSet<>();
-		aggregate.getIntraInvariants()
-			.forEach(intraInvariant -> {
-				String name = intraInvariant.getName();
+		aggregate.getIntraAggregateInvariants()
+			.forEach(intraAggregateInvariant -> {
+				String name = intraAggregateInvariant.getName();
 				if (names.contains(name)) {
 					error(String.format(DUPLICATED_INVARIANT_NAMES, name), 
-							intraInvariant, ContextMappingDSLPackage.Literals.INTRA_INVARIANT__NAME);
+							intraAggregateInvariant, ContextMappingDSLPackage.Literals.INTRA_AGGREGATE_INVARIANT__NAME);
 				}
 				names.add(name);
 			});

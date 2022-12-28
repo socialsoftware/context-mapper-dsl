@@ -145,14 +145,14 @@ public class AntiCorruptionTranslationSemanticsValidator extends AbstractCMLVali
 	}
 	
 	@Check
-	public void validateUniqueInterInvariantNames(final AntiCorruptionTranslation antiCorruptionTranslation) {
+	public void validateUniqueInterAggregateInvariantNames(final AntiCorruptionTranslation antiCorruptionTranslation) {
 		Set<String> names = new HashSet<>();
-		antiCorruptionTranslation.getInterInvariants()
-			.forEach(interInvariant -> {
-				String name = interInvariant.getName();
+		antiCorruptionTranslation.getInterAggregateInvariants()
+			.forEach(interAggregateInvariant -> {
+				String name = interAggregateInvariant.getName();
 				if (names.contains(name)) {
 					error(String.format(DUPLICATED_INVARIANT_NAMES, name), 
-							interInvariant, ContextMappingDSLPackage.Literals.INTER_INVARIANT__NAME);
+							interAggregateInvariant, ContextMappingDSLPackage.Literals.INTER_AGGREGATE_INVARIANT__NAME);
 				}
 				names.add(name);
 			});

@@ -49,11 +49,11 @@ public class ValidationMessages {
 	public static final String METHOD_REQUIRES_COLLECTION = "Method requires collection";
 	public static final String VARIABLE_ALREADY_DECLARED_IN_SCOPE = "Variable already declared in scope";
 
-	public static final String INTRA_INVARIANT_CANNOT_CONTAIN_QUERY = "Intra Invariant cannot contain query %s";
-	public static final String INTRA_INVARIANT_CANNOT_CONTAIN_VAR = "Intra Invariant cannot contain var %s";
+	public static final String INTRA_INVARIANT_CANNOT_CONTAIN_QUERY = "Intra Aggregate Invariant cannot contain query %s";
+	public static final String INTRA_INVARIANT_CANNOT_CONTAIN_VAR = "Intra Aggregate Invariant cannot contain var %s";
 	public static final String QUERY_ENTITY_DOES_NOT_BELONG_TO_AGGREGATE = "Query entity does not belong to aggregate %s";
 	public static final String QUERY_PARAM_IS_NOT_DECLARED = "Query param %s is not declared";
-	public static final String INTER_INVARIANT_CANNOT_CONTAIN_ROOT = "Inter Invariant cannot contain root";
+	public static final String INTER_INVARIANT_CANNOT_CONTAIN_ROOT = "Inter Aggregate Invariant cannot contain root";
 	public static final String BOOLEAN_EXPRESSION_INCORRECT_TYPE = "Expected a boolean expression but got %s";
 	public static final String COMPARISON_EXPRESSION_INCORRECT_TYPE = "Incompatible types %s in comparison expression";
 	public static final String IS_NOT_NUMERIC_TYPE = "%s is not numeric type";
