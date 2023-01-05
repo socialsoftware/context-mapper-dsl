@@ -512,7 +512,7 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 		}
 		
 		if (scopeVariables.get(parametricMethod.getVariable()) != null) {
-			error(String.format(	, parametricMethod.getVariable()), 
+			error(String.format(VARIABLE_ALREADY_DECLARED_IN_SCOPE, parametricMethod.getVariable()), 
 					parametricMethod, ContextMappingDSLPackage.Literals.PARAMETRIC_METHOD__VARIABLE);
 			return result;
 		} 
