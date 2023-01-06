@@ -367,6 +367,7 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 			ScopeType scopeType) {
 		String result = ERROR;
 		Entity currentEntity = null;
+		String collectionType = null;
 		
 		// process head element
 		if (pathExpression.getHeadElement().isRoot()) {
@@ -414,62 +415,73 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 				}
 			} else if (scopeType.equals(ScopeType.METHOD)) {
 				String type = scopeVariables.get(var);
+				
+				System.out.println(var + ": " + type);
+				
 				if (type == null) {
 					error(String.format(METHOD_LOCAL_VARIABLE_NOT_DECLARED, var), 
 							pathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 					return result;
 				}
-
-				currentEntity = getAggregateEntityByName(scopeAggregate, type);
-				if (currentEntity == null && objectTypes.contains(type)) {
-					return type;
-				}
 				
-				if (currentEntity == null) {
-					error(String.format(PATH_EXPRESSION_HEAD_MUST_BE_OBJECT, var), 
-							pathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
-					return result;
+				if (isCollectionType(type)) {
+					collectionType = type;
+					result = type;
+				} else {
+					currentEntity = getAggregateEntityByName(scopeAggregate, type);
+					if (currentEntity == null && objectTypes.contains(type)) {
+						return type;
+					}
+					
+					if (currentEntity == null) {
+						error(String.format(PATH_EXPRESSION_HEAD_MUST_BE_OBJECT, var), 
+								pathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
+						return result;
+					}
 				}
 			}
 		}
 		
-		if (pathExpression.getProperties().isEmpty()) return currentEntity.getName();
+		if (pathExpression.getProperties().isEmpty() && collectionType == null) 
+			return currentEntity.getName();
 		
 		// process properties
-		boolean pathExpressionEnd = false;
-		Property finalProperty = null;
-		for (Property property: pathExpression.getProperties()) {
-			if (pathExpressionEnd) {
-				error(String.format(PROPERTY_IN_PATH_IS_NOT_CORRECT_ENTITY_PROPERTY, property.getName()), 
-						pathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__PROPERTIES);
-				return result;
-			}
-			
-			if (currentEntity.getReferences().contains(property)) {
-				if (property.getCollectionType().equals(CollectionType.NONE)) {
-					currentEntity = (Entity) ((Reference) property).getDomainObjectType();
-				} else {
+		if (!pathExpression.getProperties().isEmpty()) {
+			boolean pathExpressionEnd = false;
+			Property finalProperty = null;
+			for (Property property: pathExpression.getProperties()) {
+				if (pathExpressionEnd) {
+					error(String.format(PROPERTY_IN_PATH_IS_NOT_CORRECT_ENTITY_PROPERTY, property.getName()), 
+							pathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__PROPERTIES);
+					return result;
+				}
+				
+				if (currentEntity.getReferences().contains(property)) {
+					if (property.getCollectionType().equals(CollectionType.NONE)) {
+						currentEntity = (Entity) ((Reference) property).getDomainObjectType();
+					} else {
+						finalProperty = property;
+						pathExpressionEnd = true;
+					}
+				} else if (getEntityAttributeByName(currentEntity,property.getName()) != null) {
 					finalProperty = property;
 					pathExpressionEnd = true;
 				}
-			} else if (getEntityAttributeByName(currentEntity,property.getName()) != null) {
-				finalProperty = property;
-				pathExpressionEnd = true;
+				else {
+					error(String.format(PROPERTY_IN_PATH_IS_NOT_CORRECT_ENTITY_PROPERTY, property.getName()), 
+							pathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__PROPERTIES);
+					return result;
+				}
 			}
-			else {
-				error(String.format(PROPERTY_IN_PATH_IS_NOT_CORRECT_ENTITY_PROPERTY, property.getName()), 
-						pathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__PROPERTIES);
-				return result;
+			
+			if (finalProperty instanceof Reference) {
+				result = finalProperty.getCollectionType().equals(CollectionType.NONE) ? "" : "COLLECTION$" ;
+				result = result + ((Reference) finalProperty).getDomainObjectType().getName();
+			} else {
+				result = getEntityAttributeByName(currentEntity,finalProperty.getName()).getType();
 			}
 		}
 		
-		if (finalProperty instanceof Reference) {
-			result = finalProperty.getCollectionType().equals(CollectionType.NONE) ? "" : "COLLECTION$" ;
-			result = result + ((Reference) finalProperty).getDomainObjectType().getName();
-		} else {
-			result = getEntityAttributeByName(currentEntity,finalProperty.getName()).getType();
-		}
-
 		if (pathExpression.getMethods().isEmpty()) return result;
 		
 		// process methods
@@ -517,25 +529,27 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 			return result;
 		} 
 		
-		scopeVariables.put(parametricMethod.getVariable(),getCollectionParameter(type));
+		scopeVariables.put(parametricMethod.getVariable(), getCollectionParameter(type));
 		
 		if (parametricMethod.isAllMatch()) {
-			String resultType = dispatch(parametricMethod.getBooleanExpression(), scopeAggregate, scopeVariables, scopeType);
-			if (!resultType.equals(BOOLEAN)) {
-				error(String.format(BOOLEAN_EXPRESSION_INCORRECT_TYPE, resultType), 
+			String expressionType = dispatch(parametricMethod.getBooleanExpression(), scopeAggregate, scopeVariables, scopeType);
+			System.out.println("ALLMatch " + expressionType);
+			if (!expressionType.equals(BOOLEAN)) {
+				error(String.format(BOOLEAN_EXPRESSION_INCORRECT_TYPE, expressionType), 
 						parametricMethod, ContextMappingDSLPackage.Literals.PARAMETRIC_METHOD__BOOLEAN_EXPRESSION);
 			}
-			result = resultType;
+			result = BOOLEAN;
 		} else if (parametricMethod.isFilter()) {
-			String resultType = dispatch(parametricMethod.getBooleanExpression(), scopeAggregate, scopeVariables, scopeType);
-			if (!resultType.equals(BOOLEAN)) {
-				error(String.format(BOOLEAN_EXPRESSION_INCORRECT_TYPE, resultType), 
+			String expressionType = dispatch(parametricMethod.getBooleanExpression(), scopeAggregate, scopeVariables, scopeType);
+			System.out.println("Filter: " + expressionType);
+			if (!expressionType.equals(BOOLEAN)) {
+				error(String.format(BOOLEAN_EXPRESSION_INCORRECT_TYPE, expressionType), 
 						parametricMethod, ContextMappingDSLPackage.Literals.PARAMETRIC_METHOD__BOOLEAN_EXPRESSION);
 			}
 			result = type;
 		} else if (parametricMethod.isMap()) {
-			String resultType = dispatch(parametricMethod.getExpression(), scopeAggregate, scopeVariables, scopeType);
-			result = "COLLECTION$" + resultType;
+			String expressionType = dispatch(parametricMethod.getExpression(), scopeAggregate, scopeVariables, scopeType);
+			result = "COLLECTION$" + expressionType;
 		}
 		
 		scopeVariables.remove(parametricMethod.getVariable());
@@ -549,6 +563,8 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 		if (simpleMethod.isFinal()) {
 			return BOOLEAN;
 		} else if (simpleMethod.isCount()) {
+			System.out.println("COUNT " );
+			
 			if (isCollectionType(type)) {
 				result = LONG;
 			} else {
