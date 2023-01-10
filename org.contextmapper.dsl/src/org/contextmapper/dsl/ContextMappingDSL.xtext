@@ -476,6 +476,7 @@ Prefixed returns Expression:
 Atomic returns Expression:
   LiteralExpression |	
   TernaryExpression |
+  FinalExpression |
   PathExpression |
 //  ArrayExpression |
   ParenthesizedExpression 
@@ -502,8 +503,16 @@ TernaryExpression:
    */
 ;
 
+FinalExpression:
+  'final' finalElements+=FinalElement+ 
+;
+
+FinalElement:
+	'root' ('.' properties+=[tacticdsl::Property])+
+;
+
 PathExpression:
-	headElement=HeadElement ('.' properties+=[tacticdsl::Property])*  ('.' methods+=Method)*
+	headElement=HeadElement ('.' properties+=[tacticdsl::Property])* ('.' methods+=Method)*
 ;
 
 HeadElement:
@@ -520,13 +529,21 @@ Method returns Method:
 ;
 
 SimpleMethod:
-	(final?='final' | count?='count' | distinct?='distinct')
+	count?='count()' | 
+	distinct?='distinct()' | 
+	findAny?='findAny()' | 
+	findFirst?='findFirst()' |
+	isEmpty?='isEmpty()' |
+	get?='get()'
 ;
 
 ParametricMethod:
 	allMatch?='allMatch(' variable=ID '->' booleanExpression=BooleanExpression ')' |
+	anyMatch?='anyMatch(' variable=ID '->' booleanExpression=BooleanExpression ')' |
+	noneMatch?='noneMatch(' variable=ID '->' booleanExpression=BooleanExpression ')' |
 	filter?='filter(' variable=ID '->' booleanExpression=BooleanExpression ')' |
-	map?='map(' variable=ID '->' expression=Expression ')'
+	map?='map(' variable=ID '->' expression=Expression ')' |
+	flatMap?='flatMap(' variable=ID '->' expression=Expression ')'
 ;
 
 //ArrayExpression returns Expression:

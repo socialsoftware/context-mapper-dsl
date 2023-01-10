@@ -47,8 +47,10 @@ public class ValidationMessages {
 	public static final String DUPLICATED_TRANSLATION_ATTRIBUTES = "There are duplicated translation attributes";
 	public static final String DUPLICATED_INVARIANT_NAMES = "There are duplicated invariant names %s";
 	public static final String METHOD_REQUIRES_COLLECTION = "Method requires collection";
+	public static final String METHOD_REQUIRES_OPTIONAL = "Method requires optional";
 	public static final String VARIABLE_ALREADY_DECLARED_IN_SCOPE = "Variable already declared in scope";
 
+	public static final String FINAL_EXPRESSION_ONLY_ALLOWED_IN_INTRA_INVARIANT = "Final Expression only allowed in Intra Aggregate Invariant";
 	public static final String INTRA_INVARIANT_CANNOT_CONTAIN_QUERY = "Intra Aggregate Invariant cannot contain query %s";
 	public static final String INTRA_INVARIANT_CANNOT_CONTAIN_VAR = "Intra Aggregate Invariant cannot contain var %s";
 	public static final String QUERY_ENTITY_DOES_NOT_BELONG_TO_AGGREGATE = "Query entity does not belong to aggregate %s";
@@ -59,13 +61,12 @@ public class ValidationMessages {
 	public static final String IS_NOT_NUMERIC_TYPE = "%s is not numeric type";
 	public static final String TYPES_DO_NOT_CONFORM = "Types do not conform %s";
 	public static final String INVARIANT_EXPRESSION_MUST_BE_BOOLEAN = "Invariant expression must be boolean, instead of %s";
+	public static final String INVARIANT_EXPRESSION_MUST_BE_BOOLEAN_OR_FINAL = "Invariant expression must be boolean or final, instead of %s";
 	public static final String INTER_INVARIANT_ATTRIBUTE_NOT_DECLARED_IN_ANTICORRUPTION_TRANSLATION = "Inter Invariant attribute %s not declared in anticorruption translation";
 	public static final String METHOD_LOCAL_VARIABLE_NOT_DECLARED = "Method local variable %s not declared";
 	public static final String PATH_EXPRESSION_HEAD_MUST_BE_OBJECT = "Path expresssion head %s must be object";
 	public static final String TERNARY_EXPRESSION_CONDITION_MUST_BE_BOOLEAN = "Ternary expression condition must be boolean intead of %s";
-	public static final String TERNARY_EXPRESSION_THEN_CONDITION_MUST_BE_BOOLEAN = "Ternary expression true condition must be boolean intead of %s";
-	public static final String TERNARY_EXPRESSION_ELSE_CONDITION_MUST_BE_BOOLEAN = "Ternary expression else condition must be boolean intead of %s";
-	
+
 	public static final String ALREADY_IMPLEMENTED_SUBDOMAIN = "The subdomain '%s' is already implemented through its domain '%s'.";
 	public static final String MULTIPLE_DOMAINS_IMPLEMENTED = "Are you sure you want to implement multiple Domains within one Bounded Context? A Bounded Context should typically implement only a part of your Domain; one or multiple Subdomains.";
 	public static final String ORGANIZATIONAL_MAP_DOES_NOT_CONTAIN_TEAM = "Your Context Map is of the type ORGANIZATIONAL but does not contain Bounded Contexts of the type TEAM. This type of Context Map is intended to model team relationships.";
