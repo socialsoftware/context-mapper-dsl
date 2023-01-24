@@ -520,7 +520,7 @@ HeadElement:
 ;
 
 Query:
-	{Query} entity=[tacticdsl::Entity] '(' params+=ID (',' params+=ID)* ')'
+	{Query} repositoryOperation=[tacticdsl::RepositoryOperation] '(' params+=ID (',' params+=ID)* ')'
 ;
 
 Method returns Method:

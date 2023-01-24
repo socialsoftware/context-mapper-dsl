@@ -18,7 +18,13 @@ package org.contextmapper.dsl.validation;
 import static org.contextmapper.dsl.validation.ValidationMessages.INTRA_INVARIANT_CANNOT_CONTAIN_QUERY;
 import static org.contextmapper.dsl.validation.ValidationMessages.INTER_INVARIANT_CANNOT_CONTAIN_ROOT;
 import static org.contextmapper.dsl.validation.ValidationMessages.INTRA_INVARIANT_CANNOT_CONTAIN_VAR;
-import static org.contextmapper.dsl.validation.ValidationMessages.QUERY_ENTITY_DOES_NOT_BELONG_TO_AGGREGATE;
+import static org.contextmapper.dsl.validation.ValidationMessages.QUERY_DOES_NOT_HAVE_ASSOCIATED_REPOSITORY;
+import static org.contextmapper.dsl.validation.ValidationMessages.QUERY_OPERATION_IS_NOT_DEFINED;
+import static org.contextmapper.dsl.validation.ValidationMessages.NUMBER_QUERY_PARAMETERS_ARE_NOT_CONSISTENT;
+import static org.contextmapper.dsl.validation.ValidationMessages.QUERY_DOES_NOT_RETURN_ENTITY;
+import static org.contextmapper.dsl.validation.ValidationMessages.QUERY_RETURNED_ENTITY_DOES_NOT_BELONG_TO_AGGREGATE;
+import static org.contextmapper.dsl.validation.ValidationMessages.QUERY_PARAM_TYPE_DOES_NOT_MATCH;
+
 import static org.contextmapper.dsl.validation.ValidationMessages.QUERY_PARAM_IS_NOT_DECLARED;
 import static org.contextmapper.dsl.validation.ValidationMessages.BOOLEAN_EXPRESSION_INCORRECT_TYPE;
 import static org.contextmapper.dsl.validation.ValidationMessages.COMPARISON_EXPRESSION_INCORRECT_TYPE;
@@ -41,6 +47,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.contextmapper.dsl.contextMappingDSL.Addition;
 import org.contextmapper.dsl.contextMappingDSL.Aggregate;
@@ -69,14 +76,19 @@ import org.contextmapper.dsl.contextMappingDSL.SimpleMethod;
 import org.contextmapper.dsl.contextMappingDSL.StringLiteral;
 import org.contextmapper.dsl.contextMappingDSL.TernaryExpression;
 import org.contextmapper.tactic.dsl.tacticdsl.CollectionType;
+import org.contextmapper.tactic.dsl.tacticdsl.ComplexType;
 import org.contextmapper.tactic.dsl.tacticdsl.Attribute;
 import org.contextmapper.tactic.dsl.tacticdsl.Entity;
 import org.contextmapper.tactic.dsl.tacticdsl.Property;
 import org.contextmapper.tactic.dsl.tacticdsl.Reference;
+import org.contextmapper.tactic.dsl.tacticdsl.Repository;
+import org.contextmapper.tactic.dsl.tacticdsl.RepositoryOperation;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.xtext.validation.Check;
 import org.eclipse.xtext.validation.EValidatorRegistrar;
+
+import com.google.common.reflect.Parameter;
 
 
 public class ExpressionSemanticsValidator extends AbstractCMLValidator {
@@ -409,23 +421,13 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 		} else if (pathExpression.getHeadElement().getQuery() != null) {
 			Query query = pathExpression.getHeadElement().getQuery();
 			if (scopeType.equals(ScopeType.INTRA)) {
-				error(String.format(INTRA_INVARIANT_CANNOT_CONTAIN_QUERY, query.getEntity().getName()), 
-						query, ContextMappingDSLPackage.Literals.QUERY__ENTITY);
+				error(String.format(INTRA_INVARIANT_CANNOT_CONTAIN_QUERY, query.getRepositoryOperation().getName()), 
+						query, ContextMappingDSLPackage.Literals.QUERY__REPOSITORY_OPERATION);
 				return result;
-			} else if (!isAggregateEntity(scopeAggregate,query.getEntity())) {
-				error(String.format(QUERY_ENTITY_DOES_NOT_BELONG_TO_AGGREGATE, scopeAggregate.getName()), 
-						query, ContextMappingDSLPackage.Literals.QUERY__ENTITY);
+			} else if (!validateQuery(scopeAggregate, scopeVariables, query)) {
 				return result;
 			}
-			else if (query != null) {
-				query.getParams().stream().forEach(param -> {
-					if (scopeVariables.get(param) == null) {
-						error(String.format(QUERY_PARAM_IS_NOT_DECLARED, param), 
-								query, ContextMappingDSLPackage.Literals.QUERY__PARAMS);
-					}
-				});
-				currentEntity = query.getEntity();
-			}
+			currentEntity = (Entity) query.getRepositoryOperation().getReturnType().getDomainObjectType();
 		} else if (pathExpression.getHeadElement().getVar() != null) {
 			String var = pathExpression.getHeadElement().getVar();
 			if (scopeType.equals(ScopeType.INTRA)) {
@@ -509,6 +511,65 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 		});
 
 		return result;
+	}
+	
+	private boolean validateQuery(Aggregate scopeAggregate, Map<String, String> scopeVariables, Query query) {
+		Repository repository = getAggregateEntityRoot(scopeAggregate).getRepository();
+		if (repository == null) {
+			error(String.format(QUERY_DOES_NOT_HAVE_ASSOCIATED_REPOSITORY, query.getRepositoryOperation().getName()), 
+					query, ContextMappingDSLPackage.Literals.QUERY__REPOSITORY_OPERATION);
+			return false;
+		}
+		
+		RepositoryOperation operation = repository.getOperations().stream()
+			.filter(op -> op.getName().equals(query.getRepositoryOperation().getName()))
+			.findAny()
+			.orElse(null);
+		if (operation == null) { 
+			error(String.format(QUERY_OPERATION_IS_NOT_DEFINED, query.getRepositoryOperation().getName()), 
+					query, ContextMappingDSLPackage.Literals.QUERY__REPOSITORY_OPERATION);
+			return false;
+		}
+		
+		if (operation.getParameters().size() != query.getParams().size()) {
+			error(String.format(NUMBER_QUERY_PARAMETERS_ARE_NOT_CONSISTENT, query.getRepositoryOperation().getName()), 
+					query, ContextMappingDSLPackage.Literals.QUERY__REPOSITORY_OPERATION);
+			return false;
+		}
+		
+		for (String param: query.getParams()) {
+			if (scopeVariables.get(param) == null) {
+				error(String.format(QUERY_PARAM_IS_NOT_DECLARED, param), 
+						query, ContextMappingDSLPackage.Literals.QUERY__PARAMS);
+				return false;
+			}
+		}
+		
+		for (int i = 0; i < query.getParams().size(); i++) {
+			
+			if (!isSameType(scopeVariables.get(query.getParams().get(i)), operation.getParameters().get(i).getParameterType()) ) {
+				error(String.format(QUERY_PARAM_TYPE_DOES_NOT_MATCH, query.getParams().get(i)), 
+						query, ContextMappingDSLPackage.Literals.QUERY__PARAMS);
+				return false;
+			}
+			
+		}
+		
+		if (query.getRepositoryOperation().getReturnType().getDomainObjectType() == null 
+				|| !(query.getRepositoryOperation().getReturnType().getDomainObjectType() instanceof Entity)) {
+			error(String.format(QUERY_DOES_NOT_RETURN_ENTITY, query.getRepositoryOperation().getName()), 
+					query, ContextMappingDSLPackage.Literals.QUERY__REPOSITORY_OPERATION);
+			return false;	
+		}
+		
+		Entity entity = (Entity) query.getRepositoryOperation().getReturnType().getDomainObjectType();
+		if (!isAggregateEntity(scopeAggregate, entity)) {
+			error(String.format(QUERY_RETURNED_ENTITY_DOES_NOT_BELONG_TO_AGGREGATE, entity.getName()), 
+					query, ContextMappingDSLPackage.Literals.QUERY__REPOSITORY_OPERATION);
+			return false;
+		}
+		
+		return true;
 	}
 
 	private String[] processProperties(EList<Property> properties, Entity currentEntity) {
@@ -677,6 +738,13 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 		
 		return false;
 	}	
+	
+	private boolean isSameType(String type, ComplexType parameterType) {
+		if (parameterType.getType() == null)
+			return false;
+		
+		return type.equals(parameterType.getType());
+	}
 	
 	private boolean isOptionalType(String type) {
 		return type.startsWith("OPTIONAL$");

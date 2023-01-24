@@ -49,12 +49,16 @@ public class ValidationMessages {
 	public static final String METHOD_REQUIRES_COLLECTION = "Method requires collection";
 	public static final String METHOD_REQUIRES_OPTIONAL = "Method requires optional";
 	public static final String VARIABLE_ALREADY_DECLARED_IN_SCOPE = "Variable already declared in scope";
-
 	public static final String FINAL_EXPRESSION_ONLY_ALLOWED_IN_INTRA_INVARIANT = "Final Expression only allowed in Intra Aggregate Invariant";
 	public static final String INTRA_INVARIANT_CANNOT_CONTAIN_QUERY = "Intra Aggregate Invariant cannot contain query %s";
 	public static final String INTRA_INVARIANT_CANNOT_CONTAIN_VAR = "Intra Aggregate Invariant cannot contain var %s";
-	public static final String QUERY_ENTITY_DOES_NOT_BELONG_TO_AGGREGATE = "Query entity does not belong to aggregate %s";
+	public static final String QUERY_DOES_NOT_HAVE_ASSOCIATED_REPOSITORY = "Query %s does not have associated repository";
+	public static final String NUMBER_QUERY_PARAMETERS_ARE_NOT_CONSISTENT = "Number of query %s parameters are not consistent with definition";
+	public static final String QUERY_OPERATION_IS_NOT_DEFINED = "Query operation %s is not defined in the repository";
 	public static final String QUERY_PARAM_IS_NOT_DECLARED = "Query param %s is not declared";
+	public static final String QUERY_DOES_NOT_RETURN_ENTITY = "Query %s does not return entity";
+	public static final String QUERY_RETURNED_ENTITY_DOES_NOT_BELONG_TO_AGGREGATE = "Query returned entity %s does not belong to mapped aggregate";
+	public static final String QUERY_PARAM_TYPE_DOES_NOT_MATCH = "Query param %s type does not match repository operation parameter type";
 	public static final String INTER_INVARIANT_CANNOT_CONTAIN_ROOT = "Inter Aggregate Invariant cannot contain root";
 	public static final String BOOLEAN_EXPRESSION_INCORRECT_TYPE = "Expected a boolean expression but got %s";
 	public static final String COMPARISON_EXPRESSION_INCORRECT_TYPE = "Incompatible types %s in comparison expression";
