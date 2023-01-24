@@ -473,7 +473,6 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 		if (pathExpression.getProperties().isEmpty() && collectionType == null) 
 			return currentEntity.getName();
 		
-		// process properties
 		if (!pathExpression.getProperties().isEmpty()) {
 			String[] processPropertiesResult = new String[2];
 			processPropertiesResult = processProperties(pathExpression.getProperties(), currentEntity);

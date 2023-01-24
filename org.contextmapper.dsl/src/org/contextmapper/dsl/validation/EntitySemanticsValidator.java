@@ -70,6 +70,9 @@ public class EntitySemanticsValidator extends AbstractCMLValidator {
 	
 	@Check
 	public void ValidateTranslationKeyAttributeIsUsed(final Entity entity) {
+		// this only applies to entities that uses
+		if (!entity.isUses()) return;
+		
 		Aggregate aggregate = (Aggregate) entity.eContainer();
 		BoundedContext boundedContext = (BoundedContext) aggregate.eContainer();
 		AntiCorruptionTranslation antiCorruptionTranslation = getAntiCorruptionTranslationByName(boundedContext, entity.getAntiCorruptionTranslation());
@@ -95,6 +98,9 @@ public class EntitySemanticsValidator extends AbstractCMLValidator {
 
 	@Check
 	public void ValidateWellFormedAttributesUsesTranslation(final Entity entity) {	
+		// this only applies to entities that uses
+		if (!entity.isUses()) return;
+		
 		Aggregate aggregate = (Aggregate) entity.eContainer();
 		BoundedContext boundedContext = (BoundedContext) aggregate.eContainer();
 		AntiCorruptionTranslation antiCorruptionTranslation = getAntiCorruptionTranslationByName(boundedContext, entity.getAntiCorruptionTranslation());
