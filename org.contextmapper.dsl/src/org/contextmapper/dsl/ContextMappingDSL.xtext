@@ -54,7 +54,6 @@ BoundedContext:
 	)
 	(
 		OPEN
-			(AntiCorruptionTranslations+=AntiCorruptionTranslation)*
 			(('domainVisionStatement' ('=')? domainVisionStatement=STRING)? &
 			('type' ('=')? type=BoundedContextType)? &
 			(('responsibilities' ('=')? responsibilities+=STRING) ("," responsibilities+=STRING)*)? &
@@ -63,6 +62,7 @@ BoundedContext:
 			('businessModel' ('=')? businessModel=STRING)? &
             ('evolution' ('=')? evolution=Evolution)? &
 			((application = Application)? &
+			(AntiCorruptionTranslations += AntiCorruptionTranslation)* &
 			(modules += SculptorModule)* &
 			(aggregates += Aggregate)*)
 		CLOSE
