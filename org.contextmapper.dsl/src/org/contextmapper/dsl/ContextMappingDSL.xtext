@@ -88,7 +88,7 @@ EntityAttribute :
 ;
 
 InterAggregateInvariant :
-	'InterAggregateInvariant' name=ID
+	'Invariant' name=ID
 	OPEN
 		expression=BooleanExpression
 	CLOSE
@@ -225,7 +225,7 @@ Aggregate :
 ;
 
 IntraAggregateInvariant :
-	'IntraAggregateInvariant' name=ID
+	'Invariant' name=ID
 	OPEN
 		expression=BooleanExpression
 	CLOSE
