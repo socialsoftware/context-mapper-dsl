@@ -160,35 +160,50 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 	private String dispatch(Expression expression, Aggregate scopeAggregate, Map<String, String> scopeVariables, ScopeType scopeType) {
 		System.out.println(expression.getClass().getName());
 
-		if (expression instanceof BooleanExpression booleanExpression) {
+		if (expression instanceof BooleanExpression) {
+			BooleanExpression booleanExpression = (BooleanExpression) expression;
 			return process(booleanExpression, scopeAggregate, scopeVariables, scopeType);
-		} else if (expression instanceof Comparison comparison) {
+		} else if (expression instanceof Comparison) {
+			Comparison comparison = (Comparison) expression;
 			return process(comparison, scopeAggregate, scopeVariables, scopeType);
-		} else if (expression instanceof Addition addition) {
+		} else if (expression instanceof Addition) {
+			Addition addition = (Addition) expression;
 			return process(addition, scopeAggregate, scopeVariables, scopeType);
-		} else if (expression instanceof Multiplication multiplication) {
+		} else if (expression instanceof Multiplication) {
+			Multiplication multiplication = (Multiplication) expression;
 			return process(multiplication, scopeAggregate, scopeVariables, scopeType);
-		} else if (expression instanceof BooleanNegation booleanNegation) {
+		} else if (expression instanceof BooleanNegation) {
+			BooleanNegation booleanNegation = (BooleanNegation) expression;
 			return process(booleanNegation, scopeAggregate, scopeVariables, scopeType);
-		} else if (expression instanceof ArithmeticSigned arithmeticSigned) {
+		} else if (expression instanceof ArithmeticSigned) {
+			ArithmeticSigned arithmeticSigned = (ArithmeticSigned) expression;
 			return process(arithmeticSigned, scopeAggregate, scopeVariables, scopeType);
-		} else if (expression instanceof TernaryExpression ternaryExpression) {
+		} else if (expression instanceof TernaryExpression) {
+			TernaryExpression ternaryExpression = (TernaryExpression) expression;
 			return process(ternaryExpression, scopeAggregate, scopeVariables, scopeType);
-		} else if (expression instanceof FinalExpression finalExpression) {
+		} else if (expression instanceof FinalExpression) {
+			FinalExpression finalExpression = (FinalExpression) expression;
 			return process(finalExpression, scopeAggregate, scopeVariables, scopeType);
-		} else if (expression instanceof PathExpression pathExpression) {
+		} else if (expression instanceof PathExpression) {
+			PathExpression pathExpression = (PathExpression) expression;
 			return process(pathExpression, scopeAggregate, scopeVariables, scopeType);
-		} else if (expression instanceof ParenthesizedExpression parenthesizedExpression) {
+		} else if (expression instanceof ParenthesizedExpression) {
+			ParenthesizedExpression parenthesizedExpression = (ParenthesizedExpression) expression;
 			return process(parenthesizedExpression, scopeAggregate, scopeVariables, scopeType);
-		} else if (expression instanceof NumberLiteral numberLiteral) {
+		} else if (expression instanceof NumberLiteral) {
+			NumberLiteral numberLiteral = (NumberLiteral) expression;
 			return process(numberLiteral, scopeAggregate, scopeVariables, scopeType);
-		} else if (expression instanceof NowLiteral nowLiteral) {
+		} else if (expression instanceof NowLiteral) {
+			NowLiteral nowLiteral = (NowLiteral) expression;
 			return process(nowLiteral, scopeAggregate, scopeVariables, scopeType);
-		} else if (expression instanceof StringLiteral stringLiteral) {
+		} else if (expression instanceof StringLiteral) {
+			StringLiteral stringLiteral = (StringLiteral) expression;
 			return process(stringLiteral, scopeAggregate, scopeVariables, scopeType);
-		} else if (expression instanceof NullLiteral nullLiteral) {
+		} else if (expression instanceof NullLiteral) {
+			NullLiteral nullLiteral = (NullLiteral) expression;
 			return process(nullLiteral, scopeAggregate, scopeVariables, scopeType);
-		} else if (expression instanceof BooleanLiteral booleanLiteral) {
+		} else if (expression instanceof BooleanLiteral) {
+			BooleanLiteral booleanLiteral = (BooleanLiteral) expression;
 			return process(booleanLiteral, scopeAggregate, scopeVariables, scopeType);
 		} else {
 			return ERROR;
@@ -490,9 +505,11 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 		// process methods
 		String currentType = result;
 		for (Method method: pathExpression.getMethods()) {
-			if (method instanceof SimpleMethod simpleMethod) {
+			if (method instanceof SimpleMethod) {
+				SimpleMethod simpleMethod = (SimpleMethod) method;
 				currentType = processMethod(simpleMethod, currentType, scopeAggregate, scopeVariables, ScopeType.METHOD);
-			} else if (method instanceof ParametricMethod parametricMethod) {
+			} else if (method instanceof ParametricMethod) {
+				ParametricMethod parametricMethod = (ParametricMethod) method;
 				currentType = processMethod(parametricMethod, currentType, scopeAggregate, scopeVariables, ScopeType.METHOD);
 			}
 			
