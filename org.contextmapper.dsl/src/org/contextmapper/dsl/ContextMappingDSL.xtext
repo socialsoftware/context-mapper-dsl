@@ -64,7 +64,8 @@ BoundedContext:
 			((application = Application)? &
 			(AntiCorruptionTranslations += AntiCorruptionTranslation)* &
 			(modules += SculptorModule)* &
-			(aggregates += Aggregate)*)
+			(aggregates += Aggregate)* &
+			(domainServices += Service)*)
 		CLOSE
 	)?
 ;
@@ -334,6 +335,7 @@ UseCase:
 	'UseCase' name=ID
 	(OPEN
 		(('actor' ('=')? role=STRING)? &
+		('secondaryActors' ('=')? secondaryActors+=STRING ("," secondaryActors+=STRING)*)? &
 		('interactions' ('=')? features+=Feature ("," features+=Feature)*)? &
 		('benefit' ('=')? benefit=STRING)? &
 		('scope' ('=')? scope=STRING)? &
