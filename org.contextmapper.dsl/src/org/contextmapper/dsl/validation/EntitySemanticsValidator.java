@@ -6,12 +6,11 @@ import static org.contextmapper.dsl.validation.ValidationMessages.MAPPED_BOUNDED
 import static org.contextmapper.dsl.validation.ValidationMessages.NO_RELATIONSHIP_BETWEEN_BOUNDED_CONTEXTS;
 import static org.contextmapper.dsl.validation.ValidationMessages.VALUE_OBJECT_DOES_NOT_BELONG_TO_AGGREGATE;
 import static org.contextmapper.dsl.validation.ValidationMessages.BOUNDED_CONTEXT_IS_NOT_DEFINED;
-import static org.contextmapper.dsl.validation.ValidationMessages.USES_ENTITY_HAS_NOT_BODY;
+import static org.contextmapper.dsl.validation.ValidationMessages.USED_VAlUE_OBJECT_BODY_RESTRICTIONS;
 import static org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage.Literals.DOMAIN_OBJECT__AGGREGATE_ROOT;
 import static org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage.Literals.ENTITY__BOUNDED_CONTEXT;
 import static org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage.Literals.ENTITY__AGGREGATE;
 import static org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage.Literals.ENTITY__VALUE_OBJECT;
-import static org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage.Literals.ENTITY__USES;
 
 import org.contextmapper.dsl.cml.CMLModelObjectsResolvingHelper;
 import org.contextmapper.dsl.contextMappingDSL.Aggregate;
@@ -148,17 +147,18 @@ public class EntitySemanticsValidator extends AbstractCMLValidator {
 	}
 	
 	@Check
-	public void ValidateEntityUsesHasNoAttributes(final Entity entity) {
+	public void ValidateEntityUsesHasNoElementsExceptAttributesAndConstructor(final Entity entity) {
 		if (!entity.isUses()) return;
 		
-		if (!entity.getAttributes().isEmpty() 
-				|| !entity.getAssociations().isEmpty()
-				|| !entity.getOperations().isEmpty()
-				|| !entity.getReferences().isEmpty()
-				|| entity.getRepository() != null) {
+		ValueObject valueObject = entity.getValueObject();
+		
+		if (!valueObject.getAssociations().isEmpty()
+				|| !valueObject.getOperations().isEmpty()
+				|| !valueObject.getReferences().isEmpty()
+				|| valueObject.getRepository() != null) {
 
-			error(String.format(USES_ENTITY_HAS_NOT_BODY, entity.getName()), 
-					entity, ENTITY__USES);
+			error(String.format(USED_VAlUE_OBJECT_BODY_RESTRICTIONS, valueObject.getName()), 
+					entity, ENTITY__VALUE_OBJECT);
 		}
 	
 	}

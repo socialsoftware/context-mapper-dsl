@@ -194,7 +194,15 @@ Aggregate :
      (resources+=Resource) |
      (consumers+=Consumer) |
      (domainObjects+=SimpleDomainObject))*
+     (aggregateInvariants+=AggregateInvariant)*
   CLOSE)?
+;
+
+AggregateInvariant :
+	'Invariant' name=ID
+	OPEN
+		expression=BooleanExpression
+	CLOSE
 ;
 
 Application:

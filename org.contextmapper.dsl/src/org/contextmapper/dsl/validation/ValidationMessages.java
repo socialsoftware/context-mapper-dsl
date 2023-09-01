@@ -43,10 +43,34 @@ public class ValidationMessages {
 	public static final String MAPPED_BOUNDED_CONTEXT_IS_NOT_UPSTREAM = "Mapped bounded context '%s' is not upstream.";
 	public static final String NO_RELATIONSHIP_BETWEEN_BOUNDED_CONTEXTS = "Bounded contexts should have a relationship.";
 	public static final String BOUNDED_CONTEXT_IS_NOT_DEFINED = "Bounded context '%s' not defined";
-	public static final String USES_ENTITY_HAS_NOT_BODY = "	Entity '%s' uses cannot have body";
+	public static final String USED_VAlUE_OBJECT_BODY_RESTRICTIONS = "Value object '%s' can only have attributes and constructor";
 
+	public static final String INVARIANT_EXPRESSION_MUST_BE_BOOLEAN_OR_FINAL = "Invariant expression must be boolean or final, instead of %s";
+	public static final String BOOLEAN_EXPRESSION_INCORRECT_TYPE = "Expected a boolean expression but got %s";
+	public static final String COMPARISON_EXPRESSION_INCORRECT_TYPE = "Incompatible types %s in comparison expression";
+	public static final String IS_NOT_NUMERIC_TYPE = "%s is not numeric type";
+	public static final String TERNARY_EXPRESSION_CONDITION_MUST_BE_BOOLEAN = "Ternary expression condition must be boolean intead of %s";
+	public static final String FINAL_EXPRESSION_ONLY_ALLOWED_IN_INVARIANT = "Final Expression only allowed in aggregate Invariant";
+	public static final String PROPERTY_IN_PATH_IS_NOT_CORRECT_ENTITY_PROPERTY = "Property %s in path is not a correct entity property";
+	public static final String INVARIANT_CANNOT_CONTAIN_QUERY = "Aggregate invariant cannot contain query %s";
+	public static final String CONSTRUCTOR_ASSIGNEMT_CANNOT_CONTAIN_QUERY = "Constructor assignment cannot contain query %s";
+	public static final String INVARIANT_CANNOT_CONTAIN_VAR = "Aggregate invariant cannot contain var %s";
+	public static final String METHOD_LOCAL_VARIABLE_NOT_DECLARED = "Method local variable %s not declared";
+	public static final String PATH_EXPRESSION_HEAD_MUST_BE_OBJECT = "Path expresssion head %s must be object";
+	public static final String QUERY_DOES_NOT_HAVE_ASSOCIATED_REPOSITORY = "Query %s does not have associated repository";
+	public static final String QUERY_OPERATION_IS_NOT_DEFINED = "Query operation %s is not defined in the repository";
+	public static final String NUMBER_QUERY_PARAMETERS_ARE_NOT_CONSISTENT = "Number of query %s parameters are not consistent with definition";
+	public static final String QUERY_PARAM_IS_NOT_DECLARED = "Query param %s is not declared";
+	public static final String QUERY_PARAM_TYPE_DOES_NOT_MATCH = "Query param %s type does not match repository operation parameter type";
+	public static final String QUERY_DOES_NOT_RETURN_ENTITY = "Query %s does not return entity";
+	public static final String QUERY_RETURNED_ENTITY_DOES_NOT_BELONG_TO_AGGREGATE = "Query returned entity %s does not belong to mapped aggregate";
+	public static final String METHOD_REQUIRES_COLLECTION = "Method requires collection";
+	public static final String VARIABLE_ALREADY_DECLARED_IN_SCOPE = "Variable already declared in scope";
+	public static final String METHOD_REQUIRES_OPTIONAL = "Method requires optional";
+	public static final String CONSTRUCTOR_ASSIGNEMT_CANNOT_CONTAIN_ROOT = "Constructor assignment cannot contain root";
+	public static final String CONSTRUCTOR_ASSIGNEMT_PATH_HEAD_NOT_DECLARED_AS_PARAMETER = "Constructor assigment head %s not declared as parameter";
+	public static final String CONSTRUCTOR_ASSIGNEMT_EXPRESSION_TYPE_ERROR = "Constructor assigment expression should be of type %s";
 
-	
 	/* Uniqueness problems */
 	public static final String BOUNDED_CONTEXT_NAME_NOT_UNIQUE = "Multiple bounded contexts with the name '%s' have been declared.";
 	public static final String AGGREGATE_NAME_NOT_UNIQUE = "Multiple aggregates with the name '%s' have been declared.";
@@ -61,6 +85,8 @@ public class ValidationMessages {
 	public static final String FLOW_NAME_NOT_UNIQUE = "Multiple flows with the name '%s' have been declared. Please provide unique names!";
 	public static final String FUNCTIONALITY_NAME_NOT_UNIQUE = "Multiple functionalities with the name '%s' have been declared. Please provide unique names!";
 
+	public static final String INVARIANT_NAME_NOT_UNIQUE = "Multiple invariantes with the name '%s' have been declared.";
+	
 	/* Generator problems */
 	public static final String EMPTY_UML_COMPONENT_DIAGRAM_MESSAGE = "Sorry, we cannot generate a component diagram. Your Context Map seems to be empty.";
 	public static final String EMPTY_UML_CLASS_DIAGRAM_MESSAGE = "Sorry, we cannot generate a class diagram for this Bounded Context. There are no Aggregates or none of the Aggregates contain any domain objects (entities, value objects or domain events).";

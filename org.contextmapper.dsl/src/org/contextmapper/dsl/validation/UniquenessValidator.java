@@ -26,6 +26,8 @@ import static org.contextmapper.dsl.validation.ValidationMessages.USE_CASE_NAME_
 import static org.contextmapper.dsl.validation.ValidationMessages.DOMAIN_NOT_UNIQUE;
 import static org.contextmapper.dsl.validation.ValidationMessages.FLOW_NAME_NOT_UNIQUE;
 import static org.contextmapper.dsl.validation.ValidationMessages.FUNCTIONALITY_NAME_NOT_UNIQUE;
+import static org.contextmapper.dsl.validation.ValidationMessages.INVARIANT_NAME_NOT_UNIQUE;
+
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -205,6 +207,20 @@ public class UniquenessValidator extends AbstractCMLValidator {
 			if (IteratorExtensions.size(duplicateFunctionalities) > 1)
 				error(String.format(FUNCTIONALITY_NAME_NOT_UNIQUE, functionality.getName()), functionality, ContextMappingDSLPackage.Literals.FUNCTIONALITY__NAME);
 		}
+	}
+	
+	@Check
+	public void validateUniqueAggregateInvariantNames(final Aggregate aggregate) {
+		Set<String> names = new HashSet<>();
+		aggregate.getAggregateInvariants()
+			.forEach(intraAggregateInvariant -> {
+				String name = intraAggregateInvariant.getName();
+				if (names.contains(name)) {
+					error(String.format(INVARIANT_NAME_NOT_UNIQUE, name), 
+							intraAggregateInvariant, ContextMappingDSLPackage.Literals.AGGREGATE_INVARIANT__NAME);
+				}
+				names.add(name);
+			});
 	}
 	
 	private void checkDomainObjectUnique(List<SimpleDomainObject> domainObjects) {
