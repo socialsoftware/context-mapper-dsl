@@ -5,8 +5,11 @@ import static org.contextmapper.dsl.validation.ValidationMessages.AGGREGATE_ROOT
 import static org.contextmapper.dsl.validation.ValidationMessages.MAPPED_BOUNDED_CONTEXT_IS_NOT_UPSTREAM;
 import static org.contextmapper.dsl.validation.ValidationMessages.NO_RELATIONSHIP_BETWEEN_BOUNDED_CONTEXTS;
 import static org.contextmapper.dsl.validation.ValidationMessages.VALUE_OBJECT_DOES_NOT_BELONG_TO_AGGREGATE;
+import static org.contextmapper.dsl.validation.ValidationMessages.AGGREGATE_VALUE_OBJECT_SHOULD_HAVE_ROOT_ENTITY;
 import static org.contextmapper.dsl.validation.ValidationMessages.BOUNDED_CONTEXT_IS_NOT_DEFINED;
 import static org.contextmapper.dsl.validation.ValidationMessages.USED_VAlUE_OBJECT_BODY_RESTRICTIONS;
+import static org.contextmapper.dsl.validation.ValidationMessages.USED_VAlUE_OBJECT_HAS_NO_CONSTRUCTOR;
+import static org.contextmapper.dsl.validation.ValidationMessages.ROOT_ENTITY_OF_MAPPED_AGGREGATE_SHOULD_HAVE_A_KEY_ATTRIBUTE;
 import static org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage.Literals.DOMAIN_OBJECT__AGGREGATE_ROOT;
 import static org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage.Literals.ENTITY__BOUNDED_CONTEXT;
 import static org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage.Literals.ENTITY__AGGREGATE;
@@ -21,10 +24,14 @@ import org.contextmapper.dsl.contextMappingDSL.Partnership;
 import org.contextmapper.dsl.contextMappingDSL.Relationship;
 import org.contextmapper.dsl.contextMappingDSL.SharedKernel;
 import org.contextmapper.dsl.contextMappingDSL.UpstreamDownstreamRelationship;
+import org.contextmapper.tactic.dsl.tacticdsl.Attribute;
+
 import org.contextmapper.tactic.dsl.tacticdsl.Entity;
+import org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage;
 import org.contextmapper.tactic.dsl.tacticdsl.ValueObject;
 import org.eclipse.xtext.validation.Check;
 import org.eclipse.xtext.validation.EValidatorRegistrar;
+
 
 public class EntitySemanticsValidator extends AbstractCMLValidator {
 
@@ -128,7 +135,7 @@ public class EntitySemanticsValidator extends AbstractCMLValidator {
 	}
 	
 	@Check
-	public void ValidateValueObjectBelongsToAggregate(final Entity entity) {
+	public void ValidateUsedValueObjectBelongsToAggregate(final Entity entity) {
 		if (!entity.isUses()) return;	
 
 		BoundedContext mappedBoundedContext = getBoundedContextByName(entity, entity.getBoundedContext());
@@ -143,24 +150,78 @@ public class EntitySemanticsValidator extends AbstractCMLValidator {
 			error(String.format(VALUE_OBJECT_DOES_NOT_BELONG_TO_AGGREGATE, mappedAggregate.getName()), 
 					entity, ENTITY__VALUE_OBJECT);
 		}
+	}
 	
+	@Check
+	public void ValidateAggregateThatHasUsedValueObjectHasEntityRoot(final Entity entity) {
+		if (!entity.isUses()) return;
+		
+		BoundedContext mappedBoundedContext = getBoundedContextByName(entity, entity.getBoundedContext());
+		Aggregate mappedAggregate = getAggregateByName(mappedBoundedContext, entity.getAggregate());
+		
+		if (mappedAggregate.getDomainObjects().stream()
+				.filter(Entity.class::isInstance)
+				.map(Entity.class::cast)
+				.filter(Entity::isAggregateRoot)
+				.findAny()
+				.isEmpty()) {
+			error(String.format(AGGREGATE_VALUE_OBJECT_SHOULD_HAVE_ROOT_ENTITY), 
+					entity, ENTITY__AGGREGATE);
+		}
+	}
+	
+	@Check
+	public void ValidateRootEntityOfMappedAggregateShouldHaveKeyAttribute(final Entity entity) {
+		if (!entity.isUses()) return;
+		
+		BoundedContext mappedBoundedContext = getBoundedContextByName(entity, entity.getBoundedContext());
+		Aggregate mappedAggregate = getAggregateByName(mappedBoundedContext, entity.getAggregate());
+		
+		Entity rootEntity = mappedAggregate.getDomainObjects().stream()
+								.filter(Entity.class::isInstance)
+								.map(Entity.class::cast)
+								.filter(Entity::isAggregateRoot)
+								.findAny()
+								.orElse(null);
+		
+		if (rootEntity == null) return;
+		
+		Attribute keyAttribute = rootEntity.getAttributes().stream()
+									.filter(Attribute::isKey)
+									.findAny()
+									.orElse(null);
+
+		if (keyAttribute == null) {
+			error(String.format(ROOT_ENTITY_OF_MAPPED_AGGREGATE_SHOULD_HAVE_A_KEY_ATTRIBUTE, rootEntity.getName()), 
+					entity, TacticdslPackage.Literals.ENTITY__AGGREGATE);
+		}
 	}
 	
 	@Check
 	public void ValidateEntityUsesHasNoElementsExceptAttributesAndConstructor(final Entity entity) {
 		if (!entity.isUses()) return;
 		
-		ValueObject valueObject = entity.getValueObject();
+		BoundedContext mappedBoundedContext = getBoundedContextByName(entity, entity.getBoundedContext());
+		Aggregate mappedAggregate = getAggregateByName(mappedBoundedContext, entity.getAggregate());
+		ValueObject valueObject = mappedAggregate.getDomainObjects().stream()
+				.filter(ValueObject.class::isInstance)
+				.map(ValueObject.class::cast)
+				.filter(vo -> vo.getName().equals(entity.getValueObject().getName()))
+				.findAny()
+				.get();
 		
 		if (!valueObject.getAssociations().isEmpty()
 				|| !valueObject.getOperations().isEmpty()
 				|| !valueObject.getReferences().isEmpty()
 				|| valueObject.getRepository() != null) {
-
 			error(String.format(USED_VAlUE_OBJECT_BODY_RESTRICTIONS, valueObject.getName()), 
 					entity, ENTITY__VALUE_OBJECT);
 		}
-	
+		
+		if (valueObject.getConstructor() == null) {
+			error(String.format(USED_VAlUE_OBJECT_HAS_NO_CONSTRUCTOR, valueObject.getName()), 
+					entity, ENTITY__VALUE_OBJECT);	
+		}
 	}
 	
 	private BoundedContext getBoundedContextByEntity(Entity entity) {
@@ -185,6 +246,5 @@ public class EntitySemanticsValidator extends AbstractCMLValidator {
 				.findAny()
 				.orElse(null);
 	}
-
 
 }

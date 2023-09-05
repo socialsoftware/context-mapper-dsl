@@ -1,7 +1,7 @@
 package org.contextmapper.dsl.validation;
 
 import static org.contextmapper.dsl.validation.ValidationMessages.INVARIANT_CANNOT_CONTAIN_QUERY;
-import static org.contextmapper.dsl.validation.ValidationMessages.CONSTRUCTOR_ASSIGNEMT_CANNOT_CONTAIN_ROOT;
+import static org.contextmapper.dsl.validation.ValidationMessages.CONSTRUCTOR_ASSIGNMENT_CANNOT_CONTAIN_ROOT;
 import static org.contextmapper.dsl.validation.ValidationMessages.INVARIANT_CANNOT_CONTAIN_VAR;
 import static org.contextmapper.dsl.validation.ValidationMessages.QUERY_DOES_NOT_HAVE_ASSOCIATED_REPOSITORY;
 import static org.contextmapper.dsl.validation.ValidationMessages.QUERY_OPERATION_IS_NOT_DEFINED;
@@ -13,9 +13,9 @@ import static org.contextmapper.dsl.validation.ValidationMessages.QUERY_PARAM_IS
 import static org.contextmapper.dsl.validation.ValidationMessages.BOOLEAN_EXPRESSION_INCORRECT_TYPE;
 import static org.contextmapper.dsl.validation.ValidationMessages.COMPARISON_EXPRESSION_INCORRECT_TYPE;
 import static org.contextmapper.dsl.validation.ValidationMessages.IS_NOT_NUMERIC_TYPE;
-import static org.contextmapper.dsl.validation.ValidationMessages.CONSTRUCTOR_ASSIGNEMT_EXPRESSION_TYPE_ERROR;
+import static org.contextmapper.dsl.validation.ValidationMessages.CONSTRUCTOR_ASSIGNMENT_EXPRESSION_TYPE_ERROR;
 import static org.contextmapper.dsl.validation.ValidationMessages.INVARIANT_EXPRESSION_MUST_BE_BOOLEAN_OR_FINAL;
-import static org.contextmapper.dsl.validation.ValidationMessages.CONSTRUCTOR_ASSIGNEMT_PATH_HEAD_NOT_DECLARED_AS_PARAMETER;
+import static org.contextmapper.dsl.validation.ValidationMessages.CONSTRUCTOR_ASSIGNMENT_PATH_HEAD_NOT_DECLARED_AS_PARAMETER;
 import static org.contextmapper.dsl.validation.ValidationMessages.PROPERTY_IN_PATH_IS_NOT_CORRECT_ENTITY_PROPERTY;
 import static org.contextmapper.dsl.validation.ValidationMessages.METHOD_REQUIRES_COLLECTION;
 import static org.contextmapper.dsl.validation.ValidationMessages.METHOD_REQUIRES_OPTIONAL;
@@ -24,7 +24,7 @@ import static org.contextmapper.dsl.validation.ValidationMessages.METHOD_LOCAL_V
 import static org.contextmapper.dsl.validation.ValidationMessages.PATH_EXPRESSION_HEAD_MUST_BE_OBJECT;
 import static org.contextmapper.dsl.validation.ValidationMessages.TERNARY_EXPRESSION_CONDITION_MUST_BE_BOOLEAN;
 import static org.contextmapper.dsl.validation.ValidationMessages.FINAL_EXPRESSION_ONLY_ALLOWED_IN_INVARIANT;
-import static org.contextmapper.dsl.validation.ValidationMessages.CONSTRUCTOR_ASSIGNEMT_CANNOT_CONTAIN_QUERY;
+import static org.contextmapper.dsl.validation.ValidationMessages.CONSTRUCTOR_ASSIGNMENT_CANNOT_CONTAIN_QUERY;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -141,9 +141,13 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 		
 		String type = dispatch(expression, scopeAggregate, scopeVariables, scopeType);
 		
+		if (scopeType.equals(ScopeType.CONSTRUCTOR_ASSIGNMENT)) {
+			System.out.println("XXXXXXXXXXXXXXXXXXXXX type: " + type + " attribute: " + getConstructorAssignmentAttribute(constructorAssignment).getType());
+		}
+		
 		if (scopeType.equals(ScopeType.CONSTRUCTOR_ASSIGNMENT) &&
 				!areCompatibleTypes(getConstructorAssignmentAttribute(constructorAssignment).getType(), type) ) {
-			error(String.format(CONSTRUCTOR_ASSIGNEMT_EXPRESSION_TYPE_ERROR, type), 
+			error(String.format(CONSTRUCTOR_ASSIGNMENT_EXPRESSION_TYPE_ERROR, getConstructorAssignmentAttribute(constructorAssignment).getType()), 
 					constructorAssignment, TacticdslPackage.Literals.CONSTRUCTOR_ASSIGNMENT__EXPRESSION);
 		} else if (scopeType.equals(ScopeType.INVARIANT) && !areCompatibleTypes(type, BOOLEAN) && !areCompatibleTypes(type, FINAL)) {
 			error(String.format(INVARIANT_EXPRESSION_MUST_BE_BOOLEAN_OR_FINAL, type), 
@@ -421,7 +425,7 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 		// process head element
 		if (pathExpression.getHeadElement().isRoot()) {
 			if (scopeType.equals(ScopeType.CONSTRUCTOR_ASSIGNMENT)) {
-				error(String.format(CONSTRUCTOR_ASSIGNEMT_CANNOT_CONTAIN_ROOT), 
+				error(String.format(CONSTRUCTOR_ASSIGNMENT_CANNOT_CONTAIN_ROOT), 
 						pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 				return result;
 			} else {
@@ -434,7 +438,7 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 						query, TacticdslPackage.Literals.QUERY__REPOSITORY_OPERATION);
 				return result;
 			} else if (scopeType.equals(ScopeType.CONSTRUCTOR_ASSIGNMENT)) {
-				error(String.format(CONSTRUCTOR_ASSIGNEMT_CANNOT_CONTAIN_QUERY, query.getRepositoryOperation().getName()), 
+				error(String.format(CONSTRUCTOR_ASSIGNMENT_CANNOT_CONTAIN_QUERY, query.getRepositoryOperation().getName()), 
 						query, TacticdslPackage.Literals.QUERY__REPOSITORY_OPERATION);
 				return result;
 			} else
@@ -451,11 +455,14 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 			} else if (scopeType.equals(ScopeType.CONSTRUCTOR_ASSIGNMENT)) {
 				String type = scopeVariables.get(var);
 				if (type == null) {
-					error(String.format(CONSTRUCTOR_ASSIGNEMT_PATH_HEAD_NOT_DECLARED_AS_PARAMETER, var), 
+					error(String.format(CONSTRUCTOR_ASSIGNMENT_PATH_HEAD_NOT_DECLARED_AS_PARAMETER, var), 
 							pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 					return result;
 				} else {
 					currentEntity = getAggregateEntityByName(scopeAggregate, type);
+					if (currentEntity == null) {
+						return type;
+					}
 				}
 			} else if (scopeType.equals(ScopeType.METHOD)) {
 				String type = scopeVariables.get(var);
