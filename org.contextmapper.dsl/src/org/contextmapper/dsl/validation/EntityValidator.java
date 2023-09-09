@@ -33,7 +33,7 @@ import org.eclipse.xtext.validation.Check;
 import org.eclipse.xtext.validation.EValidatorRegistrar;
 
 
-public class EntitySemanticsValidator extends AbstractCMLValidator {
+public class EntityValidator extends AbstractCMLValidator {
 
 	@Override
 	public void register(EValidatorRegistrar registrar) {
@@ -211,14 +211,14 @@ public class EntitySemanticsValidator extends AbstractCMLValidator {
 				.get();
 		
 		if (!valueObject.getAssociations().isEmpty()
-				|| !valueObject.getOperations().isEmpty()
+				|| (valueObject.getOperations().size() > 1)
 				|| !valueObject.getReferences().isEmpty()
 				|| valueObject.getRepository() != null) {
 			error(String.format(USED_VAlUE_OBJECT_BODY_RESTRICTIONS, valueObject.getName()), 
 					entity, ENTITY__VALUE_OBJECT);
 		}
 		
-		if (valueObject.getConstructor() == null) {
+		if (!valueObject.getOperations().get(0).getName().equals(valueObject.getName())) {
 			error(String.format(USED_VAlUE_OBJECT_HAS_NO_CONSTRUCTOR, valueObject.getName()), 
 					entity, ENTITY__VALUE_OBJECT);	
 		}

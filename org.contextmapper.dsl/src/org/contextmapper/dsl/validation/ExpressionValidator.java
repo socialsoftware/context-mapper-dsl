@@ -1,21 +1,23 @@
 package org.contextmapper.dsl.validation;
 
 import static org.contextmapper.dsl.validation.ValidationMessages.INVARIANT_CANNOT_CONTAIN_QUERY;
-import static org.contextmapper.dsl.validation.ValidationMessages.CONSTRUCTOR_ASSIGNMENT_CANNOT_CONTAIN_ROOT;
+import static org.contextmapper.dsl.validation.ValidationMessages.CONSTRUCTOR_COMMAND_CANNOT_CONTAIN_ROOT;
 import static org.contextmapper.dsl.validation.ValidationMessages.INVARIANT_CANNOT_CONTAIN_VAR;
-import static org.contextmapper.dsl.validation.ValidationMessages.QUERY_DOES_NOT_HAVE_ASSOCIATED_REPOSITORY;
-import static org.contextmapper.dsl.validation.ValidationMessages.QUERY_OPERATION_IS_NOT_DEFINED;
-import static org.contextmapper.dsl.validation.ValidationMessages.NUMBER_QUERY_PARAMETERS_ARE_NOT_CONSISTENT;
-import static org.contextmapper.dsl.validation.ValidationMessages.QUERY_DOES_NOT_RETURN_ENTITY;
-import static org.contextmapper.dsl.validation.ValidationMessages.QUERY_RETURNED_ENTITY_DOES_NOT_BELONG_TO_AGGREGATE;
-import static org.contextmapper.dsl.validation.ValidationMessages.QUERY_PARAM_TYPE_DOES_NOT_MATCH;
-import static org.contextmapper.dsl.validation.ValidationMessages.QUERY_PARAM_IS_NOT_DECLARED;
+import static org.contextmapper.dsl.validation.ValidationMessages.REPOSITORY_OPERATION_DOES_NOT_HAVE_ASSOCIATED_REPOSITORY;
+import static org.contextmapper.dsl.validation.ValidationMessages.REPOSITORY_OPERATION_IS_NOT_DEFINED;
+import static org.contextmapper.dsl.validation.ValidationMessages.NUMBER_QUERY_ARGUMENTS_ARE_NOT_CONSISTENT;
+import static org.contextmapper.dsl.validation.ValidationMessages.REPOSITORY_OPERATION_DOES_NOT_RETURN_ENTITY;
+import static org.contextmapper.dsl.validation.ValidationMessages.REPOSITORY_OPERATION_RETURNED_ENTITY_DOES_NOT_BELONG_TO_AGGREGATE;
+import static org.contextmapper.dsl.validation.ValidationMessages.REPOSITORY_OPERATION_ARGUMENT_TYPE_DOES_NOT_MATCH;
+import static org.contextmapper.dsl.validation.ValidationMessages.REPOSITORY_OPERATION_ARGUMENT_IS_NOT_DECLARED;
 import static org.contextmapper.dsl.validation.ValidationMessages.BOOLEAN_EXPRESSION_INCORRECT_TYPE;
 import static org.contextmapper.dsl.validation.ValidationMessages.COMPARISON_EXPRESSION_INCORRECT_TYPE;
 import static org.contextmapper.dsl.validation.ValidationMessages.IS_NOT_NUMERIC_TYPE;
-import static org.contextmapper.dsl.validation.ValidationMessages.CONSTRUCTOR_ASSIGNMENT_EXPRESSION_TYPE_ERROR;
+import static org.contextmapper.dsl.validation.ValidationMessages.CONSTRUCTOR_COMMNAD_ASSIGNMENT_EXPRESSION_TYPE_ERROR;
 import static org.contextmapper.dsl.validation.ValidationMessages.INVARIANT_EXPRESSION_MUST_BE_BOOLEAN_OR_FINAL;
 import static org.contextmapper.dsl.validation.ValidationMessages.CONSTRUCTOR_ASSIGNMENT_PATH_HEAD_NOT_DECLARED_AS_PARAMETER;
+import static org.contextmapper.dsl.validation.ValidationMessages.CONSTRUCTOR_COMMAND_SHOULD_BE_ASSIGNMENT;
+import static org.contextmapper.dsl.validation.ValidationMessages.THIS_ONLY_ALLOWED_IN_CONSTRUCTOR_COMMAND;
 import static org.contextmapper.dsl.validation.ValidationMessages.PROPERTY_IN_PATH_IS_NOT_CORRECT_ENTITY_PROPERTY;
 import static org.contextmapper.dsl.validation.ValidationMessages.METHOD_REQUIRES_COLLECTION;
 import static org.contextmapper.dsl.validation.ValidationMessages.METHOD_REQUIRES_OPTIONAL;
@@ -24,14 +26,17 @@ import static org.contextmapper.dsl.validation.ValidationMessages.METHOD_LOCAL_V
 import static org.contextmapper.dsl.validation.ValidationMessages.PATH_EXPRESSION_HEAD_MUST_BE_OBJECT;
 import static org.contextmapper.dsl.validation.ValidationMessages.TERNARY_EXPRESSION_CONDITION_MUST_BE_BOOLEAN;
 import static org.contextmapper.dsl.validation.ValidationMessages.FINAL_EXPRESSION_ONLY_ALLOWED_IN_INVARIANT;
-import static org.contextmapper.dsl.validation.ValidationMessages.CONSTRUCTOR_ASSIGNMENT_CANNOT_CONTAIN_QUERY;
+import static org.contextmapper.dsl.validation.ValidationMessages.CONSTRUCTOR_ASSIGNMENT_CANNOT_CONTAIN_REPOSITORY_OPERATION;
+import static org.contextmapper.dsl.validation.ValidationMessages.OPERATION_ARGUMENTS_CANNOT_CONTAIN_REPOSITORY_OPERATION;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 
 import org.contextmapper.dsl.cml.CMLModelObjectsResolvingHelper;
 import org.contextmapper.dsl.contextMappingDSL.Aggregate;
@@ -42,6 +47,7 @@ import org.contextmapper.dsl.contextMappingDSL.ContextMappingDSLPackage;
 
 import org.contextmapper.tactic.dsl.tacticdsl.Addition;
 import org.contextmapper.tactic.dsl.tacticdsl.ArithmeticSigned;
+import org.contextmapper.tactic.dsl.tacticdsl.AssignmentCommand;
 import org.contextmapper.tactic.dsl.tacticdsl.BooleanExpression;
 import org.contextmapper.tactic.dsl.tacticdsl.BooleanLiteral;
 import org.contextmapper.tactic.dsl.tacticdsl.BooleanNegation;
@@ -54,10 +60,12 @@ import org.contextmapper.tactic.dsl.tacticdsl.Multiplication;
 import org.contextmapper.tactic.dsl.tacticdsl.NowLiteral;
 import org.contextmapper.tactic.dsl.tacticdsl.NullLiteral;
 import org.contextmapper.tactic.dsl.tacticdsl.NumberLiteral;
+import org.contextmapper.tactic.dsl.tacticdsl.ObjectCommand;
+import org.contextmapper.tactic.dsl.tacticdsl.Operation;
+import org.contextmapper.tactic.dsl.tacticdsl.Parameter;
 import org.contextmapper.tactic.dsl.tacticdsl.ParametricMethod;
 import org.contextmapper.tactic.dsl.tacticdsl.ParenthesizedExpression;
 import org.contextmapper.tactic.dsl.tacticdsl.PathExpression;
-import org.contextmapper.tactic.dsl.tacticdsl.Query;
 import org.contextmapper.tactic.dsl.tacticdsl.SimpleMethod;
 import org.contextmapper.tactic.dsl.tacticdsl.StringLiteral;
 import org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage;
@@ -65,22 +73,22 @@ import org.contextmapper.tactic.dsl.tacticdsl.TernaryExpression;
 import org.contextmapper.tactic.dsl.tacticdsl.ValueObject;
 import org.contextmapper.tactic.dsl.tacticdsl.CollectionType;
 import org.contextmapper.tactic.dsl.tacticdsl.ComplexType;
-import org.contextmapper.tactic.dsl.tacticdsl.Constructor;
-import org.contextmapper.tactic.dsl.tacticdsl.ConstructorAssignment;
 import org.contextmapper.tactic.dsl.tacticdsl.DomainObject;
+import org.contextmapper.tactic.dsl.tacticdsl.DomainObjectOperation;
 import org.contextmapper.tactic.dsl.tacticdsl.Attribute;
 import org.contextmapper.tactic.dsl.tacticdsl.Entity;
 import org.contextmapper.tactic.dsl.tacticdsl.Property;
 import org.contextmapper.tactic.dsl.tacticdsl.Reference;
 import org.contextmapper.tactic.dsl.tacticdsl.Repository;
 import org.contextmapper.tactic.dsl.tacticdsl.RepositoryOperation;
-
+import org.contextmapper.tactic.dsl.tacticdsl.ServiceOperation;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EAttribute;
+import org.eclipse.xtext.util.Tuples;
 import org.eclipse.xtext.validation.Check;
 import org.eclipse.xtext.validation.EValidatorRegistrar;
 
-public class ExpressionSemanticsValidator extends AbstractCMLValidator {
+public class ExpressionValidator extends AbstractCMLValidator {
 	private static final String FINAL = "Final";
 	private static final String BIG_INTEGER = "BigInteger";
 	private static final String TIMESTAMP = "Timestamp";
@@ -100,7 +108,7 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 
 
 	enum ScopeType {
-		INVARIANT, CONSTRUCTOR_ASSIGNMENT, METHOD
+		INVARIANT, CONSTRUCTOR_COMMAND, SERVICE_COMMAND, METHOD, ARGUMENTS
 	}
 
 	@Override
@@ -112,47 +120,83 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 	public void ValidateExpression(final Expression expression) {
 		Aggregate scopeAggregate = null;
 		Map<String, String> scopeVariables = new HashMap<>();
-		ScopeType scopeType;
+		ScopeType scopeType = null;
 		AggregateInvariant aggregateInvariant = null;
-		ConstructorAssignment constructorAssignment = null;
+		AssignmentCommand assignmentCommand = null;
+		ObjectCommand objectCommand = null;
 
-		if (expression.eContainer() instanceof ConstructorAssignment) {
-			scopeType = ScopeType.CONSTRUCTOR_ASSIGNMENT;
-			constructorAssignment = (ConstructorAssignment) expression.eContainer();
-			Constructor constructor = (Constructor) constructorAssignment.eContainer().eContainer();
-			constructor.getParameters().stream()
-				.forEach(parameter -> {
-					if (parameter.getParameterType().getType() != null) {
-						scopeVariables.put(parameter.getName(), parameter.getParameterType().getType());
-					} else {
-						scopeVariables.put(parameter.getName(), parameter.getParameterType().getDomainObjectType().getName());
-					}
-				});
-			scopeAggregate = (Aggregate) constructor.eContainer().eContainer();
+		if (expression.eContainer() instanceof AssignmentCommand) {
+			assignmentCommand = (AssignmentCommand)  expression.eContainer();		
+			if (expression.eContainer().eContainer().eContainer().eContainer() instanceof ServiceOperation) {
+				scopeType = ScopeType.SERVICE_COMMAND;
+				ServiceOperation serviceOperation = (ServiceOperation) expression.eContainer().eContainer().eContainer().eContainer();
+				putParametersInScopeVariables(scopeVariables, serviceOperation.getParameters());
+				// TODO: It does not occur in the context of an aggregate, do we need to define the scopeAggregate
+				
+				BoundedContext boundedContext = (BoundedContext) serviceOperation.eContainer().eContainer().eContainer();
+				
+				scopeAggregate = boundedContext.getAggregates().get(0);
+				
+				objectTypes.addAll(getAggregateEntityNames(scopeAggregate));
+				
+				String type = dispatch(expression, scopeAggregate, scopeVariables, scopeType);
+			} else {
+				scopeType = ScopeType.CONSTRUCTOR_COMMAND;
+				DomainObjectOperation domainObjectOperation = (DomainObjectOperation) expression.eContainer().eContainer().eContainer().eContainer();
+				putParametersInScopeVariables(scopeVariables, domainObjectOperation.getParameters());
+				scopeAggregate = (Aggregate) domainObjectOperation.eContainer().eContainer();
+				
+				objectTypes.addAll(getAggregateEntityNames(scopeAggregate));
+				
+				String type = dispatch(expression, scopeAggregate, scopeVariables, scopeType);
+				
+				if (!areCompatibleTypes(getConstructorAssignmentAttribute(assignmentCommand).getType(), type) ) {
+					error(String.format(CONSTRUCTOR_COMMNAD_ASSIGNMENT_EXPRESSION_TYPE_ERROR, getConstructorAssignmentAttribute(assignmentCommand).getType()), 
+							assignmentCommand, TacticdslPackage.Literals.ASSIGNMENT_COMMAND__RIGHT_VALUE);
+				}
+			}
+		} else if (expression.eContainer() instanceof ObjectCommand) {
+			objectCommand = (ObjectCommand) expression.eContainer();
+		 			
+			if (expression.eContainer().eContainer().eContainer().eContainer() instanceof ServiceOperation) {
+				scopeType = ScopeType.SERVICE_COMMAND;
+				ServiceOperation serviceOperation = (ServiceOperation) expression.eContainer().eContainer().eContainer().eContainer();
+				putParametersInScopeVariables(scopeVariables, serviceOperation.getParameters());
+				// TODO: It does not occur in the context of an aggregate, do we need to define the scopeAggregate
+				return;
+			} else {
+				error(String.format(CONSTRUCTOR_COMMAND_SHOULD_BE_ASSIGNMENT), 
+					objectCommand, TacticdslPackage.Literals.OBJECT_COMMAND__EXPRESSION);
+			}
 		} else if (expression.eContainer() instanceof AggregateInvariant) {
 			scopeType = ScopeType.INVARIANT;
 			aggregateInvariant = (AggregateInvariant) expression.eContainer();
 			scopeAggregate = (Aggregate) aggregateInvariant.eContainer();
+			
+			objectTypes.addAll(getAggregateEntityNames(scopeAggregate));
+			
+			String type = dispatch(expression, scopeAggregate, scopeVariables, scopeType);
+			
+			if (!areCompatibleTypes(type, BOOLEAN) && !areCompatibleTypes(type, FINAL)) {
+				error(String.format(INVARIANT_EXPRESSION_MUST_BE_BOOLEAN_OR_FINAL, type), 
+						aggregateInvariant, ContextMappingDSLPackage.Literals.AGGREGATE_INVARIANT__EXPRESSION);
+			}
 		} else {
 			return;
-		} 
-		
-		objectTypes.addAll(getAggregateEntityNames(scopeAggregate));
-		
-		String type = dispatch(expression, scopeAggregate, scopeVariables, scopeType);
-		
-		if (scopeType.equals(ScopeType.CONSTRUCTOR_ASSIGNMENT)) {
-			System.out.println("XXXXXXXXXXXXXXXXXXXXX type: " + type + " attribute: " + getConstructorAssignmentAttribute(constructorAssignment).getType());
-		}
-		
-		if (scopeType.equals(ScopeType.CONSTRUCTOR_ASSIGNMENT) &&
-				!areCompatibleTypes(getConstructorAssignmentAttribute(constructorAssignment).getType(), type) ) {
-			error(String.format(CONSTRUCTOR_ASSIGNMENT_EXPRESSION_TYPE_ERROR, getConstructorAssignmentAttribute(constructorAssignment).getType()), 
-					constructorAssignment, TacticdslPackage.Literals.CONSTRUCTOR_ASSIGNMENT__EXPRESSION);
-		} else if (scopeType.equals(ScopeType.INVARIANT) && !areCompatibleTypes(type, BOOLEAN) && !areCompatibleTypes(type, FINAL)) {
-			error(String.format(INVARIANT_EXPRESSION_MUST_BE_BOOLEAN_OR_FINAL, type), 
-					aggregateInvariant, ContextMappingDSLPackage.Literals.AGGREGATE_INVARIANT__EXPRESSION);
-		}
+		}	
+	}
+
+	private void putParametersInScopeVariables(Map<String, String> scopeVariables, EList<Parameter> parameters) {
+		parameters.forEach(parameter -> {
+			scopeVariables.put(parameter.getName(), type2String(parameter.getParameterType()));
+		});
+	}
+	
+	private String type2String(ComplexType complexType) {
+		if (complexType.getType() != null)
+			return complexType.getType();
+		else
+			return complexType.getDomainObjectType().getName();	
 	}
 	
 	private String dispatch(Expression expression, Aggregate scopeAggregate, Map<String, String> scopeVariables, ScopeType scopeType) {
@@ -419,48 +463,66 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 	private String process(PathExpression pathExpression, Aggregate scopeAggregate, Map<String, String> scopeVariables,
 			ScopeType scopeType) {
 		String result = ERROR;
-		Entity currentEntity = null;
+		DomainObject currentDomainObject = null;
 		String collectionType = null;
 		
 		// process head element
 		if (pathExpression.getHeadElement().isRoot()) {
-			if (scopeType.equals(ScopeType.CONSTRUCTOR_ASSIGNMENT)) {
-				error(String.format(CONSTRUCTOR_ASSIGNMENT_CANNOT_CONTAIN_ROOT), 
+			if (scopeType.equals(ScopeType.CONSTRUCTOR_COMMAND)) {
+				error(String.format(CONSTRUCTOR_COMMAND_CANNOT_CONTAIN_ROOT), 
 						pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 				return result;
 			} else {
-				currentEntity = getAggregateEntityRoot(scopeAggregate);
+				currentDomainObject = getAggregateEntityRoot(scopeAggregate);
 			}
-		} else if (pathExpression.getHeadElement().getQuery() != null) {
-			Query query = pathExpression.getHeadElement().getQuery();
-			if (scopeType.equals(ScopeType.INVARIANT)) {
-				error(String.format(INVARIANT_CANNOT_CONTAIN_QUERY, query.getRepositoryOperation().getName()), 
-						query, TacticdslPackage.Literals.QUERY__REPOSITORY_OPERATION);
+		} else if (pathExpression.getHeadElement().isThis()) {
+			if (!scopeType.equals(ScopeType.CONSTRUCTOR_COMMAND)) {
+				error(String.format(THIS_ONLY_ALLOWED_IN_CONSTRUCTOR_COMMAND), 
+						pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 				return result;
-			} else if (scopeType.equals(ScopeType.CONSTRUCTOR_ASSIGNMENT)) {
-				error(String.format(CONSTRUCTOR_ASSIGNMENT_CANNOT_CONTAIN_QUERY, query.getRepositoryOperation().getName()), 
-						query, TacticdslPackage.Literals.QUERY__REPOSITORY_OPERATION);
-				return result;
-			} else
-				if (!validateQuery(scopeAggregate, scopeVariables, query)) {
-				return result;
+			} else {
+				currentDomainObject = (DomainObject) pathExpression.eContainer().eContainer().eContainer().eContainer().eContainer();
 			}
-			currentEntity = (Entity) query.getRepositoryOperation().getReturnType().getDomainObjectType();
+		} else if (pathExpression.getHeadElement().getCall() != null) {
+			Operation operation = pathExpression.getHeadElement().getCall();
+			if (operation instanceof RepositoryOperation) {
+				RepositoryOperation repositoryOperation = (RepositoryOperation) operation;
+				if (scopeType.equals(ScopeType.INVARIANT)) {
+					error(String.format(INVARIANT_CANNOT_CONTAIN_QUERY, repositoryOperation.getName()), 
+							pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
+					return result;
+				} else if (scopeType.equals(ScopeType.CONSTRUCTOR_COMMAND)) {
+					error(String.format(CONSTRUCTOR_ASSIGNMENT_CANNOT_CONTAIN_REPOSITORY_OPERATION, repositoryOperation.getName()), 
+							pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
+					return result;
+				} else if (scopeType.equals(ScopeType.ARGUMENTS)) {
+					error(String.format(OPERATION_ARGUMENTS_CANNOT_CONTAIN_REPOSITORY_OPERATION, repositoryOperation.getName()), 
+							pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
+					return result;
+				} else {
+					if (!validateRepositoryOperation(scopeAggregate, scopeVariables, repositoryOperation, pathExpression)) {
+						return result;
+					}
+				}
+				currentDomainObject = (DomainObject) repositoryOperation.getReturnType().getDomainObjectType();
+			} else {
+				// TODO: domain and service operations
+			}
 		} else if (pathExpression.getHeadElement().getVar() != null) {
 			String var = pathExpression.getHeadElement().getVar();
 			if (scopeType.equals(ScopeType.INVARIANT)) {
 				error(String.format(INVARIANT_CANNOT_CONTAIN_VAR, var), 
 						pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 				return result;
-			} else if (scopeType.equals(ScopeType.CONSTRUCTOR_ASSIGNMENT)) {
+			} else if (scopeType.equals(ScopeType.CONSTRUCTOR_COMMAND) || scopeType.equals(ScopeType.ARGUMENTS)) {
 				String type = scopeVariables.get(var);
 				if (type == null) {
 					error(String.format(CONSTRUCTOR_ASSIGNMENT_PATH_HEAD_NOT_DECLARED_AS_PARAMETER, var), 
 							pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 					return result;
 				} else {
-					currentEntity = getAggregateEntityByName(scopeAggregate, type);
-					if (currentEntity == null) {
+					currentDomainObject = getAggregateDomainObjectByName(scopeAggregate, type);
+					if (currentDomainObject == null) {
 						return type;
 					}
 				}
@@ -477,12 +539,12 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 					collectionType = type;
 					result = type;
 				} else {
-					currentEntity = getAggregateEntityByName(scopeAggregate, type);
-					if (currentEntity == null && objectTypes.contains(type)) {
+					currentDomainObject = getAggregateDomainObjectByName(scopeAggregate, type);
+					if (currentDomainObject == null && objectTypes.contains(type)) {
 						return type;
 					}
 					
-					if (currentEntity == null) {
+					if (currentDomainObject == null) {
 						error(String.format(PATH_EXPRESSION_HEAD_MUST_BE_OBJECT, var), 
 								pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 						return result;
@@ -492,11 +554,11 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 		}
 		
 		if (pathExpression.getProperties().isEmpty() && collectionType == null) 
-			return currentEntity.getName();
+			return currentDomainObject.getName();
 		
 		if (!pathExpression.getProperties().isEmpty()) {
 			String[] processPropertiesResult = new String[2];
-			processPropertiesResult = processProperties(pathExpression.getProperties(), currentEntity);
+			processPropertiesResult = processProperties(pathExpression.getProperties(), currentDomainObject);
 			result = processPropertiesResult[0];
 			if (result.equals(ERROR)) {
 				error(String.format(PROPERTY_IN_PATH_IS_NOT_CORRECT_ENTITY_PROPERTY, processPropertiesResult[1]), 
@@ -534,75 +596,78 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 		return result;
 	}
 	
-	private boolean validateQuery(Aggregate scopeAggregate, Map<String, String> scopeVariables, Query query) {
+	private boolean validateRepositoryOperation(Aggregate scopeAggregate, Map<String, String> scopeVariables, RepositoryOperation repositoryOperation, PathExpression pathExpression) {		
 		Repository repository = getAggregateEntityRoot(scopeAggregate).getRepository();
 		if (repository == null) {
-			error(String.format(QUERY_DOES_NOT_HAVE_ASSOCIATED_REPOSITORY, query.getRepositoryOperation().getName()), 
-					query, TacticdslPackage.Literals.QUERY__REPOSITORY_OPERATION);
+			error(String.format(REPOSITORY_OPERATION_DOES_NOT_HAVE_ASSOCIATED_REPOSITORY, repositoryOperation.getName()), 
+					pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 			return false;
 		}
 		
 		RepositoryOperation operation = repository.getOperations().stream()
-			.filter(op -> op.getName().equals(query.getRepositoryOperation().getName()))
+			.filter(op -> op.getName().equals(repositoryOperation.getName()))
 			.findAny()
 			.orElse(null);
 		if (operation == null) { 
-			error(String.format(QUERY_OPERATION_IS_NOT_DEFINED, query.getRepositoryOperation().getName()), 
-					query, TacticdslPackage.Literals.QUERY__REPOSITORY_OPERATION);
+			error(String.format(REPOSITORY_OPERATION_IS_NOT_DEFINED, repositoryOperation.getName()), 
+					pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 			return false;
 		}
 		
-		if (operation.getParameters().size() != query.getParams().size()) {
-			error(String.format(NUMBER_QUERY_PARAMETERS_ARE_NOT_CONSISTENT, query.getRepositoryOperation().getName()), 
-					query, TacticdslPackage.Literals.QUERY__REPOSITORY_OPERATION);
+		if (operation.getParameters().size() != pathExpression.getHeadElement().getArguments().getArgs().size()) {
+			error(String.format(NUMBER_QUERY_ARGUMENTS_ARE_NOT_CONSISTENT, repositoryOperation.getName()), 
+					pathExpression.getHeadElement(), TacticdslPackage.Literals.HEAD_ELEMENT__ARGUMENTS);
 			return false;
 		}
 		
-		for (String param: query.getParams()) {
-			if (scopeVariables.get(param) == null) {
-				error(String.format(QUERY_PARAM_IS_NOT_DECLARED, param), 
-						query, TacticdslPackage.Literals.QUERY__PARAMS);
+		for (Expression expression: pathExpression.getHeadElement().getArguments().getArgs()) {
+			String arg = ((PathExpression) expression).getHeadElement().getVar();
+			if (scopeVariables.get(arg) == null) {
+				error(String.format(REPOSITORY_OPERATION_ARGUMENT_IS_NOT_DECLARED, arg), 
+						pathExpression.getHeadElement(), TacticdslPackage.Literals.HEAD_ELEMENT__ARGUMENTS);
 				return false;
 			}
 		}
 		
-		for (int i = 0; i < query.getParams().size(); i++) {
+		for (int i = 0; i < pathExpression.getHeadElement().getArguments().getArgs().size(); i++) {
+			PathExpression argumentPathExpression = pathExpression.getHeadElement().getArguments().getArgs().get(i);
 			
-			if (!isSameType(scopeVariables.get(query.getParams().get(i)), operation.getParameters().get(i).getParameterType()) ) {
-				error(String.format(QUERY_PARAM_TYPE_DOES_NOT_MATCH, query.getParams().get(i)), 
-						query, TacticdslPackage.Literals.QUERY__PARAMS);
+			String argumentType = process(argumentPathExpression, scopeAggregate, scopeVariables, ScopeType.ARGUMENTS);
+			
+			if (!isSameType(argumentType, operation.getParameters().get(i).getParameterType()) ) {
+				error(String.format(REPOSITORY_OPERATION_ARGUMENT_TYPE_DOES_NOT_MATCH, argumentType), 
+						pathExpression.getHeadElement(), TacticdslPackage.Literals.HEAD_ELEMENT__ARGUMENTS);
 				return false;
 			}
 			
 		}
 		
-		if (query.getRepositoryOperation().getReturnType().getDomainObjectType() == null 
-				|| !(query.getRepositoryOperation().getReturnType().getDomainObjectType() instanceof Entity)) {
-			error(String.format(QUERY_DOES_NOT_RETURN_ENTITY, query.getRepositoryOperation().getName()), 
-					query, TacticdslPackage.Literals.QUERY__REPOSITORY_OPERATION);
+		if (operation.getReturnType().getDomainObjectType() == null 
+				|| !(operation.getReturnType().getDomainObjectType() instanceof Entity)) {
+			error(String.format(REPOSITORY_OPERATION_DOES_NOT_RETURN_ENTITY, operation.getName()), 
+					pathExpression.getHeadElement(), TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 			return false;	
 		}
 		
-		Entity entity = (Entity) query.getRepositoryOperation().getReturnType().getDomainObjectType();
+		Entity entity = (Entity) operation.getReturnType().getDomainObjectType();
 		if (!isAggregateEntity(scopeAggregate, entity)) {
-			error(String.format(QUERY_RETURNED_ENTITY_DOES_NOT_BELONG_TO_AGGREGATE, entity.getName()), 
-					query, TacticdslPackage.Literals.QUERY__REPOSITORY_OPERATION);
+			error(String.format(REPOSITORY_OPERATION_RETURNED_ENTITY_DOES_NOT_BELONG_TO_AGGREGATE, entity.getName()), 
+					pathExpression.getHeadElement(), TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 			return false;
 		}
 		
 		return true;
 	}
 
-	private String[] processProperties(EList<Property> properties, Entity currentEntity) {
+	private String[] processProperties(EList<Property> properties, DomainObject currentDomainObject) {
 		boolean pathExpressionEnd = false;
 		Property finalProperty = null;
 		String[] result = new String[2];
 		
-		DomainObject currentDomainObject = currentEntity;
 		
 		for (Property property: properties) {
 			if (currentDomainObject instanceof Entity && ((Entity) currentDomainObject).isUses()) {
-				currentDomainObject = getValueObject(currentEntity);
+				currentDomainObject = getValueObject((Entity) currentDomainObject);
 			}
 			
 			if (pathExpressionEnd) {
@@ -804,10 +869,10 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 				.anyMatch(entity1 -> entity1.getName().equals(entity.getName()));
 	}
 	
-	private Entity getAggregateEntityByName(Aggregate aggregate, String name) {
+	private DomainObject getAggregateDomainObjectByName(Aggregate aggregate, String name) {
 		return aggregate.getDomainObjects().stream()
-				.filter(Entity.class::isInstance)
-				.map(Entity.class::cast)
+				.filter(DomainObject.class::isInstance)
+				.map(DomainObject.class::cast)
 				.filter(entity1 -> entity1.getName().equals(name))
 				.findAny()
 				.orElse(null);
@@ -854,11 +919,11 @@ public class ExpressionSemanticsValidator extends AbstractCMLValidator {
 					.orElse(null);
 	}
 	
-	private Attribute getConstructorAssignmentAttribute(ConstructorAssignment constructorAssignment) {
-		DomainObject domainObject = (DomainObject) constructorAssignment.eContainer().eContainer().eContainer();
+	private Attribute getConstructorAssignmentAttribute(AssignmentCommand command) {
+		DomainObject domainObject = (DomainObject) command.eContainer().eContainer().eContainer().eContainer();
 		
 		return domainObject.getAttributes().stream()
-			.filter(attribute -> attribute.getName().equals(constructorAssignment.getAttribute().getName()))
+			.filter(attribute -> attribute.getName().equals(command.getLeftValue().getProperties().get(0).getName()))
 			.findAny()
 			.orElse(null);
 	}

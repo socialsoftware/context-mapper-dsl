@@ -111,7 +111,13 @@ ServiceOperation :
 	  ("hint" "=" hint=STRING)? &
 	  (publish=Publish)?
     )
-    (delegateHolder=ServiceOperationDelegate)? (':' (readOnlyOperation?='read-only' | (writeOperation?='write' ('[' stateTransition=StateTransition ']')?)))? ";"
+    (delegateHolder=ServiceOperationDelegate)? (':' (readOnlyOperation?='read-only' | (writeOperation?='write' ('[' stateTransition=StateTransition ']')?)))? 
+    ((body=OperationBody) | ";")
+;
+
+OperationBody: {OperationBody} "{" 
+	(commands+=Command)?(";" commands+=Command)*
+	"}"
 ;
 
 StateTransition:
@@ -261,7 +267,6 @@ ValueObject :
      (operations+=DomainObjectOperation) |
      (associations+=Association))*
     (repository=Repository)?
-    (constructor=Constructor)?
   "}")?;
   
 DomainEvent :
@@ -291,7 +296,6 @@ DomainEvent :
      (operations+=DomainObjectOperation) |
      (associations+=Association))*
     (repository=Repository)?
-    (constructor=Constructor)?
   "}")?;
 
 CommandEvent :
@@ -344,7 +348,10 @@ DomainObjectOperation :
       ("throws" throws=ThrowsIdentifier)? &
 	  ("hint" "=" hint=STRING)?
     )
-    (':' (readOnlyOperation?='read-only' | (writeOperation?='write' ('[' stateTransition=StateTransition ']')?)))? ";";
+    (':' (readOnlyOperation?='read-only' | (writeOperation?='write' ('[' stateTransition=StateTransition ']')?)))? 
+    ((body=OperationBody) | ";")
+    	
+;
 
 DataTransferObject :
   (comment=ML_COMMENT)?
@@ -585,18 +592,16 @@ terminal ASC :
   
 // Added for microservices simulator  
 
-Constructor :
-	"constructor" name=ID ("(" (parameters+=Parameter)?("," parameters+=Parameter)* ")")? body=ConstructorBody?
+Command: 
+	assigmentCommand=AssignmentCommand | objectCommand=ObjectCommand
 ;
 
-ConstructorBody :
-	"{"
-	(assignments+=ConstructorAssignment)+
-	"}"
+AssignmentCommand:
+	(returnType=ComplexType)? leftValue=PathExpression "=" rightValue=Expression
 ;
 
-ConstructorAssignment :
-	"this" "." attribute=[Attribute] "=" expression=Expression ";"
+ObjectCommand:
+	("create" | "delete" | "return" | "publish") expression=PathExpression
 ;
   
   
@@ -648,7 +653,7 @@ Atomic returns Expression:
   FinalExpression |
   PathExpression |
 //  ArrayExpression |
-  ParenthesizedExpression 
+  ParenthesizedExpression
 //  {FunctionReference} ref=Function |
 //  {VariableReference} ref=Variable |
 //  {PropertyExpression} ref=PropertyExpression
@@ -685,11 +690,15 @@ PathExpression:
 ;
 
 HeadElement:
-    (var=ID | root?='root' | query=Query) 
+    var=ID | root?='root' | this?='this' | (call=[Operation] arguments=Arguments)
 ;
 
-Query:
-	{Query} repositoryOperation=[RepositoryOperation] '(' params+=ID (',' params+=ID)* ')'
+Operation :
+  ServiceOperation | RepositoryOperation | DomainObjectOperation 
+;
+
+Arguments:
+	'(' args+=PathExpression (',' args+=PathExpression)* ')'
 ;
 
 Method returns Method:

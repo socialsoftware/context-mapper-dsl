@@ -193,9 +193,19 @@ Aggregate :
     ((services+=Service) |
      (resources+=Resource) |
      (consumers+=Consumer) |
+     (eventHandling+=EventHandling) |
      (domainObjects+=SimpleDomainObject))*
      (aggregateInvariants+=AggregateInvariant)*
   CLOSE)?
+;
+
+EventHandling:
+	'handle' eventId=ID context=[BoundedContext] "::" aggregate=[Aggregate] "::" event=[tacticdsl::Event] 
+	OPEN
+	'activate' exp=BooleanExpression
+	'process' functionality=[Functionality] arguments=Arguments
+	CLOSE
+	
 ;
 
 AggregateInvariant :
@@ -216,14 +226,17 @@ CLOSE)?
 ;
 
 Functionality:
-	"Functionality" name=ID (OPEN
+	"Functionality" 
+	(returnType=ComplexType|"void")? name=ID ("(" (parameters+=Parameter)?("," parameters+=Parameter)* ")")? (OPEN
 		(sagaOrchestrator?="sagaOrchestrator")?
 		(functionalitySteps+=FunctionalityStep)*
 	CLOSE)?
 ;
 
 FunctionalityStep:
-	boundedContext=[BoundedContext] '.' service=[tacticdsl::Service] '.' operation=[tacticdsl::ServiceOperation] ';'
+	(returnType=ComplexType var=ID "=")?
+	boundedContext=[BoundedContext] '.' service=[tacticdsl::Service] '.' operation=[tacticdsl::ServiceOperation] 
+	("(" (args+=PathExpression)?("," args+=PathExpression)* ")")? ';'
 ;
 
 Flow:
