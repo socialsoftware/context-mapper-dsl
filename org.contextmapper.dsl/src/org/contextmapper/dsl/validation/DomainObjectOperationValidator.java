@@ -1,12 +1,9 @@
 package org.contextmapper.dsl.validation;
 
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
 
 import static org.contextmapper.dsl.validation.ValidationMessages.DOMAIN_OBJECT_OPERATION_PARAMETERS_REQUIRE_AGGREGATE_ROOT;
 import static org.contextmapper.dsl.validation.ValidationMessages.DOMAIN_OBJECT_OPERATION_PARAMETER_TYPE_ERROR;
@@ -18,17 +15,18 @@ import static org.contextmapper.dsl.validation.ValidationMessages.DOMAIN_OBJECT_
 import static org.contextmapper.dsl.validation.ValidationMessages.DOMAIN_OBJECT_OPERATION_CONSTRUCTOR_ASSIGMENT_COMMAND_LEFT_PATH_EXPRESSION_SHOULD_USE_THIS;
 
 import org.contextmapper.dsl.contextMappingDSL.Aggregate;
-import org.contextmapper.tactic.dsl.tacticdsl.AssignmentCommand;
+import org.contextmapper.dsl.contextMappingDSL.AssignmentCommand;
 import org.contextmapper.tactic.dsl.tacticdsl.Attribute;
 import org.contextmapper.tactic.dsl.tacticdsl.CollectionType;
-import org.contextmapper.tactic.dsl.tacticdsl.Command;
+import org.contextmapper.dsl.contextMappingDSL.Command;
+import org.contextmapper.dsl.contextMappingDSL.ContextMappingDSLPackage;
 import org.contextmapper.tactic.dsl.tacticdsl.ComplexType;
 import org.contextmapper.tactic.dsl.tacticdsl.DomainEvent;
 import org.contextmapper.tactic.dsl.tacticdsl.DomainObject;
-import org.contextmapper.tactic.dsl.tacticdsl.DomainObjectOperation;
+import org.contextmapper.dsl.contextMappingDSL.DomainObjectOperation;
 import org.contextmapper.tactic.dsl.tacticdsl.Entity;
 import org.contextmapper.tactic.dsl.tacticdsl.Parameter;
-import org.contextmapper.tactic.dsl.tacticdsl.PathExpression;
+import org.contextmapper.dsl.contextMappingDSL.PathExpression;
 import org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage;
 import org.contextmapper.tactic.dsl.tacticdsl.ValueObject;
 import org.eclipse.xtext.validation.Check;
@@ -115,7 +113,7 @@ public class DomainObjectOperationValidator extends AbstractCMLValidator {
 				PathExpression leftPathExpression = assignmentCommand.getLeftValue();
 				if (!leftPathExpression.getHeadElement().isThis()) {
 					error(String.format(DOMAIN_OBJECT_OPERATION_CONSTRUCTOR_ASSIGMENT_COMMAND_LEFT_PATH_EXPRESSION_SHOULD_USE_THIS), 
-							leftPathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
+							leftPathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 				}
 				
 				if (assignmentCommand.getRightValue() instanceof PathExpression) {
@@ -130,7 +128,7 @@ public class DomainObjectOperationValidator extends AbstractCMLValidator {
 				}
 			} else {
 				error(String.format(DOMAIN_OBJECT_OPERATION_CONSTRUCTOR_COMMAND), 
-							command, TacticdslPackage.Literals.COMMAND__OBJECT_COMMAND);
+							command, ContextMappingDSLPackage.Literals.COMMAND__OBJECT_COMMAND);
 			}
 		}
 		
@@ -154,7 +152,7 @@ public class DomainObjectOperationValidator extends AbstractCMLValidator {
 				
 		List<AssignmentCommand> assignments = domainObjectOperation.getBody().getCommands().stream()
 																.map(command -> command.getAssigmentCommand())
-																.toList();
+																.collect(Collectors.toList());
 		
 		Set<String> attributeNames = attributes.stream()
 				.map(Attribute::getName)
@@ -166,7 +164,7 @@ public class DomainObjectOperationValidator extends AbstractCMLValidator {
 			String attributeName = assignment.getLeftValue().getProperties().get(0).getName();
 			if (assignedAttributeNames.add(attributeName) == false) {
 				error(String.format(ATTRIBUTE_IN_CONSTRUCTOR_ASSIGNMENT_ONLY_ONCE, attributeName), 
-						assignment, TacticdslPackage.Literals.ASSIGNMENT_COMMAND__LEFT_VALUE);
+						assignment, ContextMappingDSLPackage.Literals.ASSIGNMENT_COMMAND__LEFT_VALUE);
 			}
 			
 		}
@@ -184,7 +182,7 @@ public class DomainObjectOperationValidator extends AbstractCMLValidator {
 			String attributeName = assignment.getLeftValue().getProperties().get(0).getName();
 			if (!attributeNames.contains(attributeName)) {
 				error(String.format(ATTRIBUTE_IN_CONSTRUCTOR_ASSIGNMENT_IS_NOT_DECLARED, attributeName), 
-						assignment, TacticdslPackage.Literals.ASSIGNMENT_COMMAND__LEFT_VALUE);
+						assignment, ContextMappingDSLPackage.Literals.ASSIGNMENT_COMMAND__LEFT_VALUE);
 			}
 		});	
 	}

@@ -43,7 +43,6 @@ public class ValidationMessages {
 	public static final String AGGREGATE_VALUE_OBJECT_SHOULD_HAVE_ROOT_ENTITY = "Aggregate should have root entity.";
 	public static final String MAPPED_BOUNDED_CONTEXT_IS_NOT_UPSTREAM = "Mapped bounded context '%s' is not upstream.";
 	public static final String NO_RELATIONSHIP_BETWEEN_BOUNDED_CONTEXTS = "Bounded contexts should have a relationship.";
-	public static final String BOUNDED_CONTEXT_IS_NOT_DEFINED = "Bounded context '%s' not defined";
 	public static final String USED_VAlUE_OBJECT_BODY_RESTRICTIONS = "Value object '%s' can only have attributes and constructor.";
 	public static final String USED_VAlUE_OBJECT_HAS_NO_CONSTRUCTOR = "Value object '%s' should have constructor.";
 

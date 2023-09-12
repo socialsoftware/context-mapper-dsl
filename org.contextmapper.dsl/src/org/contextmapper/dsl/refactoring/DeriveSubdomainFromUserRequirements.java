@@ -29,7 +29,7 @@ import org.contextmapper.dsl.contextMappingDSL.UserRequirement;
 import org.contextmapper.dsl.refactoring.exception.RefactoringInputException;
 import org.contextmapper.tactic.dsl.tacticdsl.Attribute;
 import org.contextmapper.tactic.dsl.tacticdsl.CollectionType;
-import org.contextmapper.tactic.dsl.tacticdsl.Entity;
+import org.contextmapper.dsl.contextMappingDSL.Entity;
 import org.contextmapper.tactic.dsl.tacticdsl.Reference;
 import org.contextmapper.tactic.dsl.tacticdsl.Service;
 import org.contextmapper.tactic.dsl.tacticdsl.ServiceOperation;
@@ -149,7 +149,7 @@ public class DeriveSubdomainFromUserRequirements extends AbstractRefactoring imp
 		String entityName = mapEntityName(entity);
 		Optional<Entity> alreadyExistingEntity = subdomain.getEntities().stream().filter(e -> entityName.equals(e.getName())).findFirst();
 		if (!alreadyExistingEntity.isPresent()) {
-			Entity newEntity = TacticdslFactory.eINSTANCE.createEntity();
+			Entity newEntity = ContextMappingDSLFactory.eINSTANCE.createEntity();
 			newEntity.setName(entityName);
 			createEntityAttributes(newEntity, attributes);
 			addElementToEList(subdomain.getEntities(), newEntity);

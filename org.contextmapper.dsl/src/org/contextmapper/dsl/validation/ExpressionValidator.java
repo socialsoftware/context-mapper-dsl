@@ -45,38 +45,37 @@ import org.contextmapper.dsl.contextMappingDSL.BoundedContext;
 import org.contextmapper.dsl.contextMappingDSL.ContextMap;
 import org.contextmapper.dsl.contextMappingDSL.ContextMappingDSLPackage;
 
-import org.contextmapper.tactic.dsl.tacticdsl.Addition;
-import org.contextmapper.tactic.dsl.tacticdsl.ArithmeticSigned;
-import org.contextmapper.tactic.dsl.tacticdsl.AssignmentCommand;
-import org.contextmapper.tactic.dsl.tacticdsl.BooleanExpression;
-import org.contextmapper.tactic.dsl.tacticdsl.BooleanLiteral;
-import org.contextmapper.tactic.dsl.tacticdsl.BooleanNegation;
-import org.contextmapper.tactic.dsl.tacticdsl.Comparison;
-import org.contextmapper.tactic.dsl.tacticdsl.Expression;
-import org.contextmapper.tactic.dsl.tacticdsl.FinalElement;
-import org.contextmapper.tactic.dsl.tacticdsl.FinalExpression;
-import org.contextmapper.tactic.dsl.tacticdsl.Method;
-import org.contextmapper.tactic.dsl.tacticdsl.Multiplication;
-import org.contextmapper.tactic.dsl.tacticdsl.NowLiteral;
-import org.contextmapper.tactic.dsl.tacticdsl.NullLiteral;
-import org.contextmapper.tactic.dsl.tacticdsl.NumberLiteral;
-import org.contextmapper.tactic.dsl.tacticdsl.ObjectCommand;
+import org.contextmapper.dsl.contextMappingDSL.Addition;
+import org.contextmapper.dsl.contextMappingDSL.ArithmeticSigned;
+import org.contextmapper.dsl.contextMappingDSL.AssignmentCommand;
+import org.contextmapper.dsl.contextMappingDSL.BooleanExpression;
+import org.contextmapper.dsl.contextMappingDSL.BooleanLiteral;
+import org.contextmapper.dsl.contextMappingDSL.BooleanNegation;
+import org.contextmapper.dsl.contextMappingDSL.Comparison;
+import org.contextmapper.dsl.contextMappingDSL.Expression;
+import org.contextmapper.dsl.contextMappingDSL.FinalElement;
+import org.contextmapper.dsl.contextMappingDSL.FinalExpression;
+import org.contextmapper.dsl.contextMappingDSL.Method;
+import org.contextmapper.dsl.contextMappingDSL.Multiplication;
+import org.contextmapper.dsl.contextMappingDSL.NowLiteral;
+import org.contextmapper.dsl.contextMappingDSL.NullLiteral;
+import org.contextmapper.dsl.contextMappingDSL.NumberLiteral;
+import org.contextmapper.dsl.contextMappingDSL.ObjectCommand;
 import org.contextmapper.tactic.dsl.tacticdsl.Operation;
 import org.contextmapper.tactic.dsl.tacticdsl.Parameter;
-import org.contextmapper.tactic.dsl.tacticdsl.ParametricMethod;
-import org.contextmapper.tactic.dsl.tacticdsl.ParenthesizedExpression;
-import org.contextmapper.tactic.dsl.tacticdsl.PathExpression;
-import org.contextmapper.tactic.dsl.tacticdsl.SimpleMethod;
-import org.contextmapper.tactic.dsl.tacticdsl.StringLiteral;
-import org.contextmapper.tactic.dsl.tacticdsl.TacticdslPackage;
-import org.contextmapper.tactic.dsl.tacticdsl.TernaryExpression;
+import org.contextmapper.dsl.contextMappingDSL.ParametricMethod;
+import org.contextmapper.dsl.contextMappingDSL.ParenthesizedExpression;
+import org.contextmapper.dsl.contextMappingDSL.PathExpression;
+import org.contextmapper.dsl.contextMappingDSL.SimpleMethod;
+import org.contextmapper.dsl.contextMappingDSL.StringLiteral;
+import org.contextmapper.dsl.contextMappingDSL.TernaryExpression;
 import org.contextmapper.tactic.dsl.tacticdsl.ValueObject;
 import org.contextmapper.tactic.dsl.tacticdsl.CollectionType;
 import org.contextmapper.tactic.dsl.tacticdsl.ComplexType;
 import org.contextmapper.tactic.dsl.tacticdsl.DomainObject;
 import org.contextmapper.tactic.dsl.tacticdsl.DomainObjectOperation;
 import org.contextmapper.tactic.dsl.tacticdsl.Attribute;
-import org.contextmapper.tactic.dsl.tacticdsl.Entity;
+import org.contextmapper.dsl.contextMappingDSL.Entity;
 import org.contextmapper.tactic.dsl.tacticdsl.Property;
 import org.contextmapper.tactic.dsl.tacticdsl.Reference;
 import org.contextmapper.tactic.dsl.tacticdsl.Repository;
@@ -152,7 +151,7 @@ public class ExpressionValidator extends AbstractCMLValidator {
 				
 				if (!areCompatibleTypes(getConstructorAssignmentAttribute(assignmentCommand).getType(), type) ) {
 					error(String.format(CONSTRUCTOR_COMMNAD_ASSIGNMENT_EXPRESSION_TYPE_ERROR, getConstructorAssignmentAttribute(assignmentCommand).getType()), 
-							assignmentCommand, TacticdslPackage.Literals.ASSIGNMENT_COMMAND__RIGHT_VALUE);
+							assignmentCommand, ContextMappingDSLPackage.Literals.ASSIGNMENT_COMMAND__RIGHT_VALUE);
 				}
 			}
 		} else if (expression.eContainer() instanceof ObjectCommand) {
@@ -166,7 +165,7 @@ public class ExpressionValidator extends AbstractCMLValidator {
 				return;
 			} else {
 				error(String.format(CONSTRUCTOR_COMMAND_SHOULD_BE_ASSIGNMENT), 
-					objectCommand, TacticdslPackage.Literals.OBJECT_COMMAND__EXPRESSION);
+					objectCommand, ContextMappingDSLPackage.Literals.OBJECT_COMMAND__EXPRESSION);
 			}
 		} else if (expression.eContainer() instanceof AggregateInvariant) {
 			scopeType = ScopeType.INVARIANT;
@@ -264,12 +263,12 @@ public class ExpressionValidator extends AbstractCMLValidator {
 		
 		if (!areCompatibleTypes(leftType, BOOLEAN)) {
 			error(String.format(BOOLEAN_EXPRESSION_INCORRECT_TYPE, leftType), 
-					booleanExpression, TacticdslPackage.Literals.BOOLEAN_EXPRESSION__LEFT);
+					booleanExpression, ContextMappingDSLPackage.Literals.BOOLEAN_EXPRESSION__LEFT);
 			result = ERROR;
 		}
 		if (rightType != null && !areCompatibleTypes(rightType, BOOLEAN)) {
 			error(String.format(BOOLEAN_EXPRESSION_INCORRECT_TYPE, rightType), 
-					booleanExpression, TacticdslPackage.Literals.BOOLEAN_EXPRESSION__RIGHT);
+					booleanExpression, ContextMappingDSLPackage.Literals.BOOLEAN_EXPRESSION__RIGHT);
 			result = ERROR;
 		}
 		
@@ -290,7 +289,7 @@ public class ExpressionValidator extends AbstractCMLValidator {
 			result = leftType;
 		} else if (!areCompatibleTypes(leftType, rightType)) {
 			error(String.format(COMPARISON_EXPRESSION_INCORRECT_TYPE, leftType + " <> " + rightType), 
-					comparison, TacticdslPackage.Literals.COMPARISON__OP);
+					comparison, ContextMappingDSLPackage.Literals.COMPARISON__OP);
 			result = ERROR;
 		}
 
@@ -312,11 +311,11 @@ public class ExpressionValidator extends AbstractCMLValidator {
 			result = leftType;
 		} else if (!isNumeric(leftType)) {
 			error(String.format(IS_NOT_NUMERIC_TYPE, leftType), 
-					addition, TacticdslPackage.Literals.ADDITION__LEFT);
+					addition, ContextMappingDSLPackage.Literals.ADDITION__LEFT);
 			result = ERROR;
 		} else if (!isNumeric(rightType)) {
 			error(String.format(IS_NOT_NUMERIC_TYPE, rightType), 
-					addition, TacticdslPackage.Literals.ADDITION__RIGHT);
+					addition, ContextMappingDSLPackage.Literals.ADDITION__RIGHT);
 			result = ERROR;
 		} else {
 			result = leftType;
@@ -340,10 +339,10 @@ public class ExpressionValidator extends AbstractCMLValidator {
 			result = leftType;
 		} else if (!isNumeric(leftType)) {
 			error(String.format(IS_NOT_NUMERIC_TYPE, leftType), 
-					multiplication, TacticdslPackage.Literals.MULTIPLICATION__LEFT);
+					multiplication, ContextMappingDSLPackage.Literals.MULTIPLICATION__LEFT);
 		} else if (!isNumeric(rightType)) {
 			error(String.format(IS_NOT_NUMERIC_TYPE, rightType), 
-					multiplication, TacticdslPackage.Literals.MULTIPLICATION__RIGHT);
+					multiplication, ContextMappingDSLPackage.Literals.MULTIPLICATION__RIGHT);
 			result = ERROR;
 		} else {
 			result = leftType;
@@ -358,7 +357,7 @@ public class ExpressionValidator extends AbstractCMLValidator {
 		
 		if (!isNumeric(type)) {
 			error(String.format(IS_NOT_NUMERIC_TYPE, type), 
-					arithmeticSigned, TacticdslPackage.Literals.ARITHMETIC_SIGNED__ATOMIC);
+					arithmeticSigned, ContextMappingDSLPackage.Literals.ARITHMETIC_SIGNED__ATOMIC);
 			type = ERROR;
 		}
 			
@@ -371,7 +370,7 @@ public class ExpressionValidator extends AbstractCMLValidator {
 		
 		if (!areCompatibleTypes(type, BOOLEAN)) {
 			error(String.format(BOOLEAN_EXPRESSION_INCORRECT_TYPE, type), 
-					booleanNegation, TacticdslPackage.Literals.BOOLEAN_NEGATION__ATOMIC);
+					booleanNegation, ContextMappingDSLPackage.Literals.BOOLEAN_NEGATION__ATOMIC);
 			type = ERROR;
 		}
 			
@@ -416,7 +415,7 @@ public class ExpressionValidator extends AbstractCMLValidator {
 		String result = dispatch(ternaryExpression.getCondition(), scopeAggregate, scopeVariables, scopeType);
 		if (!result.equals(BOOLEAN)) {
 			error(String.format(TERNARY_EXPRESSION_CONDITION_MUST_BE_BOOLEAN, result), 
-					ternaryExpression, TacticdslPackage.Literals.TERNARY_EXPRESSION__CONDITION);
+					ternaryExpression, ContextMappingDSLPackage.Literals.TERNARY_EXPRESSION__CONDITION);
 			return ERROR;
 		}
 		result = dispatch(ternaryExpression.getTruevalue(), scopeAggregate, scopeVariables, scopeType);
@@ -436,7 +435,7 @@ public class ExpressionValidator extends AbstractCMLValidator {
 		
 		if (!scopeType.equals(ScopeType.INVARIANT)) {
 			error(String.format(FINAL_EXPRESSION_ONLY_ALLOWED_IN_INVARIANT), 
-					finalExpression, TacticdslPackage.Literals.FINAL_EXPRESSION__FINAL_ELEMENTS);
+					finalExpression, ContextMappingDSLPackage.Literals.FINAL_EXPRESSION__FINAL_ELEMENTS);
 		}
 		
 		Entity currentEntity = getAggregateEntityRoot(scopeAggregate);
@@ -446,7 +445,7 @@ public class ExpressionValidator extends AbstractCMLValidator {
 			processPropertiesResult = processProperties(finalElement.getProperties(), currentEntity);
 			if (processPropertiesResult[0].equals(ERROR)) {
 				error(String.format(PROPERTY_IN_PATH_IS_NOT_CORRECT_ENTITY_PROPERTY, processPropertiesResult[1]), 
-						finalElement, TacticdslPackage.Literals.FINAL_ELEMENT__PROPERTIES);
+						finalElement, ContextMappingDSLPackage.Literals.FINAL_ELEMENT__PROPERTIES);
 			}
 			
 			result = processPropertiesResult[0].equals(ERROR) || result.equals(ERROR) ? ERROR : result;
@@ -470,7 +469,7 @@ public class ExpressionValidator extends AbstractCMLValidator {
 		if (pathExpression.getHeadElement().isRoot()) {
 			if (scopeType.equals(ScopeType.CONSTRUCTOR_COMMAND)) {
 				error(String.format(CONSTRUCTOR_COMMAND_CANNOT_CONTAIN_ROOT), 
-						pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
+						pathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 				return result;
 			} else {
 				currentDomainObject = getAggregateEntityRoot(scopeAggregate);
@@ -478,7 +477,7 @@ public class ExpressionValidator extends AbstractCMLValidator {
 		} else if (pathExpression.getHeadElement().isThis()) {
 			if (!scopeType.equals(ScopeType.CONSTRUCTOR_COMMAND)) {
 				error(String.format(THIS_ONLY_ALLOWED_IN_CONSTRUCTOR_COMMAND), 
-						pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
+						pathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 				return result;
 			} else {
 				currentDomainObject = (DomainObject) pathExpression.eContainer().eContainer().eContainer().eContainer().eContainer();
@@ -489,15 +488,15 @@ public class ExpressionValidator extends AbstractCMLValidator {
 				RepositoryOperation repositoryOperation = (RepositoryOperation) operation;
 				if (scopeType.equals(ScopeType.INVARIANT)) {
 					error(String.format(INVARIANT_CANNOT_CONTAIN_QUERY, repositoryOperation.getName()), 
-							pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
+							pathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 					return result;
 				} else if (scopeType.equals(ScopeType.CONSTRUCTOR_COMMAND)) {
 					error(String.format(CONSTRUCTOR_ASSIGNMENT_CANNOT_CONTAIN_REPOSITORY_OPERATION, repositoryOperation.getName()), 
-							pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
+							pathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 					return result;
 				} else if (scopeType.equals(ScopeType.ARGUMENTS)) {
 					error(String.format(OPERATION_ARGUMENTS_CANNOT_CONTAIN_REPOSITORY_OPERATION, repositoryOperation.getName()), 
-							pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
+							pathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 					return result;
 				} else {
 					if (!validateRepositoryOperation(scopeAggregate, scopeVariables, repositoryOperation, pathExpression)) {
@@ -512,13 +511,13 @@ public class ExpressionValidator extends AbstractCMLValidator {
 			String var = pathExpression.getHeadElement().getVar();
 			if (scopeType.equals(ScopeType.INVARIANT)) {
 				error(String.format(INVARIANT_CANNOT_CONTAIN_VAR, var), 
-						pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
+						pathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 				return result;
 			} else if (scopeType.equals(ScopeType.CONSTRUCTOR_COMMAND) || scopeType.equals(ScopeType.ARGUMENTS)) {
 				String type = scopeVariables.get(var);
 				if (type == null) {
 					error(String.format(CONSTRUCTOR_ASSIGNMENT_PATH_HEAD_NOT_DECLARED_AS_PARAMETER, var), 
-							pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
+							pathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 					return result;
 				} else {
 					currentDomainObject = getAggregateDomainObjectByName(scopeAggregate, type);
@@ -531,7 +530,7 @@ public class ExpressionValidator extends AbstractCMLValidator {
 								
 				if (type == null) {
 					error(String.format(METHOD_LOCAL_VARIABLE_NOT_DECLARED, var), 
-							pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
+							pathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 					return result;
 				}
 				
@@ -546,7 +545,7 @@ public class ExpressionValidator extends AbstractCMLValidator {
 					
 					if (currentDomainObject == null) {
 						error(String.format(PATH_EXPRESSION_HEAD_MUST_BE_OBJECT, var), 
-								pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
+								pathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 						return result;
 					}
 				}
@@ -562,7 +561,7 @@ public class ExpressionValidator extends AbstractCMLValidator {
 			result = processPropertiesResult[0];
 			if (result.equals(ERROR)) {
 				error(String.format(PROPERTY_IN_PATH_IS_NOT_CORRECT_ENTITY_PROPERTY, processPropertiesResult[1]), 
-						pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__PROPERTIES);
+						pathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__PROPERTIES);
 			}
 		}
 		
@@ -600,7 +599,7 @@ public class ExpressionValidator extends AbstractCMLValidator {
 		Repository repository = getAggregateEntityRoot(scopeAggregate).getRepository();
 		if (repository == null) {
 			error(String.format(REPOSITORY_OPERATION_DOES_NOT_HAVE_ASSOCIATED_REPOSITORY, repositoryOperation.getName()), 
-					pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
+					pathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 			return false;
 		}
 		
@@ -610,13 +609,13 @@ public class ExpressionValidator extends AbstractCMLValidator {
 			.orElse(null);
 		if (operation == null) { 
 			error(String.format(REPOSITORY_OPERATION_IS_NOT_DEFINED, repositoryOperation.getName()), 
-					pathExpression, TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
+					pathExpression, ContextMappingDSLPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 			return false;
 		}
 		
 		if (operation.getParameters().size() != pathExpression.getHeadElement().getArguments().getArgs().size()) {
 			error(String.format(NUMBER_QUERY_ARGUMENTS_ARE_NOT_CONSISTENT, repositoryOperation.getName()), 
-					pathExpression.getHeadElement(), TacticdslPackage.Literals.HEAD_ELEMENT__ARGUMENTS);
+					pathExpression.getHeadElement(), ContextMappingDSLPackage.Literals.HEAD_ELEMENT__ARGUMENTS);
 			return false;
 		}
 		
@@ -624,7 +623,7 @@ public class ExpressionValidator extends AbstractCMLValidator {
 			String arg = ((PathExpression) expression).getHeadElement().getVar();
 			if (scopeVariables.get(arg) == null) {
 				error(String.format(REPOSITORY_OPERATION_ARGUMENT_IS_NOT_DECLARED, arg), 
-						pathExpression.getHeadElement(), TacticdslPackage.Literals.HEAD_ELEMENT__ARGUMENTS);
+						pathExpression.getHeadElement(), ContextMappingDSLPackage.Literals.HEAD_ELEMENT__ARGUMENTS);
 				return false;
 			}
 		}
@@ -636,7 +635,7 @@ public class ExpressionValidator extends AbstractCMLValidator {
 			
 			if (!isSameType(argumentType, operation.getParameters().get(i).getParameterType()) ) {
 				error(String.format(REPOSITORY_OPERATION_ARGUMENT_TYPE_DOES_NOT_MATCH, argumentType), 
-						pathExpression.getHeadElement(), TacticdslPackage.Literals.HEAD_ELEMENT__ARGUMENTS);
+						pathExpression.getHeadElement(), ContextMappingDSLPackage.Literals.HEAD_ELEMENT__ARGUMENTS);
 				return false;
 			}
 			
@@ -645,14 +644,14 @@ public class ExpressionValidator extends AbstractCMLValidator {
 		if (operation.getReturnType().getDomainObjectType() == null 
 				|| !(operation.getReturnType().getDomainObjectType() instanceof Entity)) {
 			error(String.format(REPOSITORY_OPERATION_DOES_NOT_RETURN_ENTITY, operation.getName()), 
-					pathExpression.getHeadElement(), TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
+					pathExpression.getHeadElement(), ContextMappingDSLPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 			return false;	
 		}
 		
 		Entity entity = (Entity) operation.getReturnType().getDomainObjectType();
 		if (!isAggregateEntity(scopeAggregate, entity)) {
 			error(String.format(REPOSITORY_OPERATION_RETURNED_ENTITY_DOES_NOT_BELONG_TO_AGGREGATE, entity.getName()), 
-					pathExpression.getHeadElement(), TacticdslPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
+					pathExpression.getHeadElement(), ContextMappingDSLPackage.Literals.PATH_EXPRESSION__HEAD_ELEMENT);
 			return false;
 		}
 		
@@ -710,16 +709,16 @@ public class ExpressionValidator extends AbstractCMLValidator {
 		
 		if (!isCollectionType(type)) {
 			EAttribute feature = 
-						parametricMethod.isAllMatch() ? TacticdslPackage.Literals.PARAMETRIC_METHOD__ALL_MATCH 
-						: (parametricMethod.isFilter() ? TacticdslPackage.Literals.PARAMETRIC_METHOD__FILTER
-						: TacticdslPackage.Literals.PARAMETRIC_METHOD__MAP);
+						parametricMethod.isAllMatch() ? ContextMappingDSLPackage.Literals.PARAMETRIC_METHOD__ALL_MATCH 
+						: (parametricMethod.isFilter() ? ContextMappingDSLPackage.Literals.PARAMETRIC_METHOD__FILTER
+						: ContextMappingDSLPackage.Literals.PARAMETRIC_METHOD__MAP);
 			error(String.format(METHOD_REQUIRES_COLLECTION), parametricMethod, feature);
 			return result;
 		}
 		
 		if (scopeVariables.get(parametricMethod.getVariable()) != null) {
 			error(String.format(VARIABLE_ALREADY_DECLARED_IN_SCOPE, parametricMethod.getVariable()), 
-					parametricMethod, TacticdslPackage.Literals.PARAMETRIC_METHOD__VARIABLE);
+					parametricMethod, ContextMappingDSLPackage.Literals.PARAMETRIC_METHOD__VARIABLE);
 			return result;
 		} 
 		
@@ -729,14 +728,14 @@ public class ExpressionValidator extends AbstractCMLValidator {
 			String expressionType = dispatch(parametricMethod.getBooleanExpression(), scopeAggregate, scopeVariables, scopeType);
 			if (!expressionType.equals(BOOLEAN)) {
 				error(String.format(BOOLEAN_EXPRESSION_INCORRECT_TYPE, expressionType), 
-						parametricMethod, TacticdslPackage.Literals.PARAMETRIC_METHOD__BOOLEAN_EXPRESSION);
+						parametricMethod, ContextMappingDSLPackage.Literals.PARAMETRIC_METHOD__BOOLEAN_EXPRESSION);
 			}
 			result = BOOLEAN;
 		} else if (parametricMethod.isFilter()) {
 			String expressionType = dispatch(parametricMethod.getBooleanExpression(), scopeAggregate, scopeVariables, scopeType);
 			if (!expressionType.equals(BOOLEAN)) {
 				error(String.format(BOOLEAN_EXPRESSION_INCORRECT_TYPE, expressionType), 
-						parametricMethod, TacticdslPackage.Literals.PARAMETRIC_METHOD__BOOLEAN_EXPRESSION);
+						parametricMethod, ContextMappingDSLPackage.Literals.PARAMETRIC_METHOD__BOOLEAN_EXPRESSION);
 			}
 			result = type;
 		} else if (parametricMethod.isMap()) {
@@ -759,42 +758,42 @@ public class ExpressionValidator extends AbstractCMLValidator {
 				result = LONG;
 			} else {
 				error(String.format(METHOD_REQUIRES_COLLECTION), 
-						simpleMethod, TacticdslPackage.Literals.SIMPLE_METHOD__COUNT);
+						simpleMethod, ContextMappingDSLPackage.Literals.SIMPLE_METHOD__COUNT);
 			}
 		} else if (simpleMethod.isDistinct()) {
 			if (isCollectionType(type)) {
 				result = type;
 			} else {
 				error(String.format(METHOD_REQUIRES_COLLECTION), 
-						simpleMethod, TacticdslPackage.Literals.SIMPLE_METHOD__DISTINCT);
+						simpleMethod, ContextMappingDSLPackage.Literals.SIMPLE_METHOD__DISTINCT);
 			}
 		} else if (simpleMethod.isFindAny()) {
 			if (isCollectionType(type)) {
 				result = "OPTIONAL$" + getCollectionParameter(type);
 			} else {
 				error(String.format(METHOD_REQUIRES_COLLECTION), 
-						simpleMethod, TacticdslPackage.Literals.SIMPLE_METHOD__FIND_ANY);
+						simpleMethod, ContextMappingDSLPackage.Literals.SIMPLE_METHOD__FIND_ANY);
 			}
 		} else if (simpleMethod.isFindFirst()) {
 			if (isCollectionType(type)) {
 				result = "OPTIONAL$" + getCollectionParameter(type);
 			} else {
 				error(String.format(METHOD_REQUIRES_COLLECTION), 
-						simpleMethod, TacticdslPackage.Literals.SIMPLE_METHOD__FIND_FIRST);
+						simpleMethod, ContextMappingDSLPackage.Literals.SIMPLE_METHOD__FIND_FIRST);
 			}
 		} else if (simpleMethod.isIsEmpty()) {
 			if (isOptionalType(type)) {
 				result = BOOLEAN;
 			} else {
 				error(String.format(METHOD_REQUIRES_OPTIONAL), 
-						simpleMethod, TacticdslPackage.Literals.SIMPLE_METHOD__IS_EMPTY);
+						simpleMethod, ContextMappingDSLPackage.Literals.SIMPLE_METHOD__IS_EMPTY);
 			}
 		}  else if (simpleMethod.isGet()) {
 			if (isOptionalType(type)) {
 				result = getOptionalParameter(type);
 			} else {
 				error(String.format(METHOD_REQUIRES_OPTIONAL), 
-						simpleMethod, TacticdslPackage.Literals.SIMPLE_METHOD__GET);
+						simpleMethod, ContextMappingDSLPackage.Literals.SIMPLE_METHOD__GET);
 			}
 		}
 		return result;
