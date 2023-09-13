@@ -58,7 +58,7 @@ class PlantUMLAggregateClassDiagramCreatorTest extends AbstractCMLInputFileTest 
 		// given
 		Aggregate aggregate = ContextMappingDSLFactory.eINSTANCE.createAggregate();
 		aggregate.setName("testAggregate");
-		Entity entity = TacticdslFactory.eINSTANCE.createEntity();
+		Entity entity = ContextMappingDSLFactory.eINSTANCE.createEntity();
 		entity.setName("Test");
 		Attribute attribute = TacticdslFactory.eINSTANCE.createAttribute();
 		attribute.setType("int");

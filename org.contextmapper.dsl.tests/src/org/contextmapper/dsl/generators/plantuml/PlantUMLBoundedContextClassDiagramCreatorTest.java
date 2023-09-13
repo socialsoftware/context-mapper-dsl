@@ -38,7 +38,7 @@ import org.contextmapper.tactic.dsl.tacticdsl.CommandEvent;
 import org.contextmapper.tactic.dsl.tacticdsl.ComplexType;
 import org.contextmapper.tactic.dsl.tacticdsl.DomainEvent;
 import org.contextmapper.tactic.dsl.tacticdsl.DomainObjectOperation;
-import org.contextmapper.tactic.dsl.tacticdsl.Entity;
+import org.contextmapper.dsl.contextMappingDSL.Entity;
 import org.contextmapper.tactic.dsl.tacticdsl.Enum;
 import org.contextmapper.tactic.dsl.tacticdsl.EnumValue;
 import org.contextmapper.tactic.dsl.tacticdsl.Parameter;
@@ -83,7 +83,7 @@ class PlantUMLBoundedContextClassDiagramCreatorTest extends AbstractCMLInputFile
 		testModule.setName("mySuperModule");
 		testModule.setBasePackage("org.contextmapper");
 		boundedContext.getModules().add(testModule);
-		Entity testEntity = TacticdslFactory.eINSTANCE.createEntity();
+		Entity testEntity = ContextMappingDSLFactory.eINSTANCE.createEntity();
 		testEntity.setName("TestEntity");
 		testModule.getDomainObjects().add(testEntity);
 
@@ -138,7 +138,7 @@ class PlantUMLBoundedContextClassDiagramCreatorTest extends AbstractCMLInputFile
 		Aggregate aggregate = ContextMappingDSLFactory.eINSTANCE.createAggregate();
 		aggregate.setName("testAggregate");
 		boundedContext.getAggregates().add(aggregate);
-		Entity entity = TacticdslFactory.eINSTANCE.createEntity();
+		Entity entity = ContextMappingDSLFactory.eINSTANCE.createEntity();
 		entity.setName("Test");
 		Attribute attribute = TacticdslFactory.eINSTANCE.createAttribute();
 		attribute.setType("int");
@@ -218,7 +218,7 @@ class PlantUMLBoundedContextClassDiagramCreatorTest extends AbstractCMLInputFile
 		Aggregate aggregate = ContextMappingDSLFactory.eINSTANCE.createAggregate();
 		aggregate.setName("testAggregate");
 		boundedContext.getAggregates().add(aggregate);
-		Entity entity = TacticdslFactory.eINSTANCE.createEntity();
+		Entity entity = ContextMappingDSLFactory.eINSTANCE.createEntity();
 		entity.setName("Test");
 		Attribute attribute = TacticdslFactory.eINSTANCE.createAttribute();
 		attribute.setType("int");
@@ -242,9 +242,9 @@ class PlantUMLBoundedContextClassDiagramCreatorTest extends AbstractCMLInputFile
 		Aggregate aggregate = ContextMappingDSLFactory.eINSTANCE.createAggregate();
 		aggregate.setName("testAggregate");
 		boundedContext.getAggregates().add(aggregate);
-		Entity entity = TacticdslFactory.eINSTANCE.createEntity();
+		Entity entity = ContextMappingDSLFactory.eINSTANCE.createEntity();
 		entity.setName("Test");
-		Entity referencedEntity = TacticdslFactory.eINSTANCE.createEntity();
+		Entity referencedEntity = ContextMappingDSLFactory.eINSTANCE.createEntity();
 		referencedEntity.setName("ReferencedEntity");
 		Reference reference = TacticdslFactory.eINSTANCE.createReference();
 		reference.setName("otherEntity");
@@ -269,9 +269,9 @@ class PlantUMLBoundedContextClassDiagramCreatorTest extends AbstractCMLInputFile
 		Aggregate aggregate = ContextMappingDSLFactory.eINSTANCE.createAggregate();
 		aggregate.setName("testAggregate");
 		boundedContext.getAggregates().add(aggregate);
-		Entity entity = TacticdslFactory.eINSTANCE.createEntity();
+		Entity entity = ContextMappingDSLFactory.eINSTANCE.createEntity();
 		entity.setName("Test");
-		Entity referencedEntity = TacticdslFactory.eINSTANCE.createEntity();
+		Entity referencedEntity = ContextMappingDSLFactory.eINSTANCE.createEntity();
 		referencedEntity.setName("ReferencedEntity");
 		Reference reference = TacticdslFactory.eINSTANCE.createReference();
 		reference.setAssociationLabel("uses");
@@ -295,7 +295,7 @@ class PlantUMLBoundedContextClassDiagramCreatorTest extends AbstractCMLInputFile
 		Aggregate aggregate = ContextMappingDSLFactory.eINSTANCE.createAggregate();
 		aggregate.setName("testAggregate");
 		boundedContext.getAggregates().add(aggregate);
-		Entity entity = TacticdslFactory.eINSTANCE.createEntity();
+		Entity entity = ContextMappingDSLFactory.eINSTANCE.createEntity();
 		entity.setName("Test");
 		entity.setAggregateRoot(true);
 		aggregate.getDomainObjects().add(entity);
@@ -393,11 +393,11 @@ class PlantUMLBoundedContextClassDiagramCreatorTest extends AbstractCMLInputFile
 		Aggregate aggregate = ContextMappingDSLFactory.eINSTANCE.createAggregate();
 		aggregate.setName("testAggregate");
 		boundedContext.getAggregates().add(aggregate);
-		Entity customer = TacticdslFactory.eINSTANCE.createEntity();
+		Entity customer = ContextMappingDSLFactory.eINSTANCE.createEntity();
 		customer.setName("Customer");
-		Entity address = TacticdslFactory.eINSTANCE.createEntity();
+		Entity address = ContextMappingDSLFactory.eINSTANCE.createEntity();
 		address.setName("Address");
-		Entity anotherObject = TacticdslFactory.eINSTANCE.createEntity();
+		Entity anotherObject = ContextMappingDSLFactory.eINSTANCE.createEntity();
 		anotherObject.setName("AnotherObject");
 		Reference reference = TacticdslFactory.eINSTANCE.createReference();
 		reference.setDomainObjectType(address);
@@ -499,8 +499,8 @@ class PlantUMLBoundedContextClassDiagramCreatorTest extends AbstractCMLInputFile
 		boundedContext.getAggregates().add(aggregate);
 		aggregate.getDomainObjects().add(TacticdslFactory.eINSTANCE.createSimpleDomainObject());
 
-		Entity entity1 = TacticdslFactory.eINSTANCE.createEntity();
-		Entity entity2 = TacticdslFactory.eINSTANCE.createEntity();
+		Entity entity1 = ContextMappingDSLFactory.eINSTANCE.createEntity();
+		Entity entity2 = ContextMappingDSLFactory.eINSTANCE.createEntity();
 		entity1.setName("TestEntity1");
 		entity2.setName("TestEntity2");
 
@@ -548,7 +548,7 @@ class PlantUMLBoundedContextClassDiagramCreatorTest extends AbstractCMLInputFile
 		Aggregate aggregate = ContextMappingDSLFactory.eINSTANCE.createAggregate();
 		aggregate.setName("testAggregate");
 		boundedContext.getAggregates().add(aggregate);
-		Entity entity = TacticdslFactory.eINSTANCE.createEntity();
+		Entity entity = ContextMappingDSLFactory.eINSTANCE.createEntity();
 		entity.setName("Test");
 		DomainObjectOperation operation = TacticdslFactory.eINSTANCE.createDomainObjectOperation();
 		operation.setName("doSomething");
@@ -705,9 +705,9 @@ class PlantUMLBoundedContextClassDiagramCreatorTest extends AbstractCMLInputFile
 		Aggregate aggregate = ContextMappingDSLFactory.eINSTANCE.createAggregate();
 		aggregate.setName("testAggregate");
 		boundedContext.getAggregates().add(aggregate);
-		Entity entity1 = TacticdslFactory.eINSTANCE.createEntity();
+		Entity entity1 = ContextMappingDSLFactory.eINSTANCE.createEntity();
 		entity1.setName("Customer");
-		Entity entity2 = TacticdslFactory.eINSTANCE.createEntity();
+		Entity entity2 = ContextMappingDSLFactory.eINSTANCE.createEntity();
 		entity2.setName("AbstractEntity");
 		entity1.setExtends(entity2);
 		aggregate.getDomainObjects().add(entity1);
@@ -801,7 +801,7 @@ class PlantUMLBoundedContextClassDiagramCreatorTest extends AbstractCMLInputFile
 		Aggregate aggregate = ContextMappingDSLFactory.eINSTANCE.createAggregate();
 		aggregate.setName("testAggregate");
 		boundedContext.getAggregates().add(aggregate);
-		Entity entity1 = TacticdslFactory.eINSTANCE.createEntity();
+		Entity entity1 = ContextMappingDSLFactory.eINSTANCE.createEntity();
 		entity1.setName("Customer");
 		entity1.setExtendsName("AbstractEntity");
 		aggregate.getDomainObjects().add(entity1);

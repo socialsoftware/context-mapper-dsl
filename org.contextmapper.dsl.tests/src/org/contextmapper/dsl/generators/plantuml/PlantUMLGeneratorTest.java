@@ -33,7 +33,7 @@ import org.contextmapper.dsl.generator.exception.GeneratorInputException;
 import org.contextmapper.dsl.generators.mocks.ContextMappingModelResourceMock;
 import org.contextmapper.dsl.generators.mocks.IFileSystemAccess2Mock;
 import org.contextmapper.dsl.generators.mocks.IGeneratorContextMock;
-import org.contextmapper.tactic.dsl.tacticdsl.Entity;
+import org.contextmapper.dsl.contextMappingDSL.Entity;
 import org.contextmapper.tactic.dsl.tacticdsl.TacticdslFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -223,7 +223,7 @@ class PlantUMLGeneratorTest extends AbstractCMLInputFileTest {
 	}
 
 	private Entity createTestEntity(String name) {
-		Entity testEntity = TacticdslFactory.eINSTANCE.createEntity();
+		Entity testEntity = ContextMappingDSLFactory.eINSTANCE.createEntity();
 		testEntity.setName(name);
 		return testEntity;
 	}

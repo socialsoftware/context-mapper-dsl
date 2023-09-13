@@ -24,7 +24,7 @@ import org.contextmapper.dsl.contextMappingDSL.Subdomain;
 import org.contextmapper.dsl.generator.plantuml.PlantUMLSubdomainClassDiagramCreator;
 import org.contextmapper.tactic.dsl.tacticdsl.Attribute;
 import org.contextmapper.tactic.dsl.tacticdsl.CollectionType;
-import org.contextmapper.tactic.dsl.tacticdsl.Entity;
+import org.contextmapper.dsl.contextMappingDSL.Entity;
 import org.contextmapper.tactic.dsl.tacticdsl.TacticdslFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,7 +70,7 @@ class PlantUMLSubdomainClassDiagramCreatorTest extends AbstractCMLInputFileTest 
 		// given
 		Subdomain subdomain = ContextMappingDSLFactory.eINSTANCE.createSubdomain();
 		subdomain.setName("MyTestSubdomain");
-		Entity entity = TacticdslFactory.eINSTANCE.createEntity();
+		Entity entity = ContextMappingDSLFactory.eINSTANCE.createEntity();
 		entity.setName("Test");
 		Attribute attribute = TacticdslFactory.eINSTANCE.createAttribute();
 		attribute.setType("int");
