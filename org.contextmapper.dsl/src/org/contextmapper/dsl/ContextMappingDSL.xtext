@@ -27,7 +27,8 @@ ContextMappingModel:
 		(map = ContextMap)? &
 		(boundedContexts += BoundedContext)* &
 		(domains += Domain)* &
-		(userRequirements += UserRequirement)*
+		(userRequirements += UserRequirement)* &
+		(accessTraces += AccessTrace)*
 	)
 ;
 
@@ -215,7 +216,7 @@ Functionality:
 ;
 
 FunctionalityStep:
-	boundedContext=[BoundedContext] '.' service=[tacticdsl::Service] '.' operation=[tacticdsl::ServiceOperation] ';'
+	boundedContext=[BoundedContext] '::' service=[tacticdsl::Service] '::' operation=[tacticdsl::ServiceOperation] ';'
 ;
 
 Flow:

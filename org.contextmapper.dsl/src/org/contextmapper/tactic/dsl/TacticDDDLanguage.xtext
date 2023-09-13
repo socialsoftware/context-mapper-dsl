@@ -109,7 +109,24 @@ ServiceOperation :
 	  ("hint" "=" hint=STRING)? &
 	  (publish=Publish)?
     )
-    (delegateHolder=ServiceOperationDelegate)? (':' (readOnlyOperation?='read-only' | (writeOperation?='write' ('[' stateTransition=StateTransition ']')?)))? ";"
+    (delegateHolder=ServiceOperationDelegate)?
+    (':' (readOnlyOperation?='read-only' | (writeOperation?='write' ('[' stateTransition=StateTransition ']')?)))?
+    (";" | "{" ("trace" ("=")? accessTrace=[AccessTrace])? "}")
+;
+
+AccessTrace:
+	'AccessTrace' name=ID
+	("{"
+		(access+=Access)*
+	"}")
+;
+
+Access:
+	'@' accessedEntity=[Entity] (':' accessType=AccessType)?
+;
+
+AccessType:
+	'create' | 'read' | 'update' | 'delete'
 ;
 
 StateTransition:
